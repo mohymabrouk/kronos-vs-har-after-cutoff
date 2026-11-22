@@ -1,5 +1,7 @@
 # Kronos vs HAR-RV: next-day crypto volatility after the foundation model's data cutoff
 
+[![tests](https://github.com/mohymabrouk/kronos-vs-har-after-cutoff/actions/workflows/tests.yml/badge.svg)](https://github.com/mohymabrouk/kronos-vs-har-after-cutoff/actions/workflows/tests.yml)
+
 Every number below is read from `results/` by `python -m kvh.cli report`; nothing in the tables was typed by
 hand.
 
