@@ -1,0 +1,10 @@
+{
+ "student_params": 2369,
+ "teacher_params": 28699418,
+ "student_forward_us": 31.25,
+ "student_features_us": 5937.5,
+ "teacher_cpu_us": 2535561.4059080966,
+ "r2_log_student_vs_teacher": 0.66951527669211,
+ "corr_log_student_teacher": 0.8432951760048241,
+ "qlike_student_to_teacher": 0.34326780481656016
+}

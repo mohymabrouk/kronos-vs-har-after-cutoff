@@ -1,0 +1,30 @@
+{
+ "baselines_cpu_s_per_forecast": {
+  "LightGBM": 0.0016137855579868709,
+  "HAR": 9.915207877461707e-05,
+  "log-HAR": 0.00015727571115973742,
+  "EWMA (RV)": 6.838074398249453e-06,
+  "EWMA (r2)": 0.0,
+  "GARCH(1,1)": 0.0003589989059080963
+ },
+ "Kronos-mini": {
+  "cpu_s": 0.8836946115973742,
+  "wall_s": 0.448092365098434,
+  "forecasts": 4570
+ },
+ "Kronos-small": {
+  "cpu_s": 2.5355614059080964,
+  "wall_s": 1.2820184049015932,
+  "forecasts": 4570
+ },
+ "Kronos-base": {
+  "cpu_s": 5.175,
+  "wall_s": 2.6179089478282864,
+  "forecasts": 230
+ },
+ "student": {
+  "forward_us": 31.25,
+  "features_us": 5937.5
+ },
+ "student_params": 2369
+}

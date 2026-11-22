@@ -1,0 +1,11 @@
+model,mcs_p,in_mcs_10pct
+Kronos-small,0.0525,False
+EWMA (RV),0.151,True
+Kronos-mini,0.151,True
+HAR,0.151,True
+EWMA (r2),0.151,True
+Student,0.1895,True
+"GARCH(1,1)",0.1895,True
+Combo: log-HAR x Kronos-small,0.1895,True
+log-HAR,0.288,True
+LightGBM,1.0,True
