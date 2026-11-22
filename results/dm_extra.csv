@@ -1,0 +1,8 @@
+n,model,versus,mean_qlike_diff,dm,p
+4570,Kronos-small,log-HAR,0.1894,2.88,0.0039
+4570,Kronos-mini,log-HAR,0.1984,2.22,0.0267
+4570,Combo: log-HAR x Kronos-small,log-HAR,0.0517,1.79,0.0734
+4570,Student,Kronos-small,-0.0902,-4.08,0.0
+4570,Student,log-HAR,0.0992,1.93,0.0535
+4570,Kronos-mini,Kronos-small,0.0089,0.28,0.7787
+4570,LightGBM,log-HAR,-0.0193,-1.07,0.2845
