@@ -1,13 +1,22 @@
 # Kronos vs HAR-RV: next-day crypto volatility after the foundation model's data cutoff
 
-Project 3 of 5 in the quant research series. Every number below is read from `results/` by
-`python -m kvh.cli report`; nothing in the tables was typed by hand.
+Every number below is read from `results/` by `python -m kvh.cli report`; nothing in the tables was typed by
+hand.
 
 ## Headline
 
-**No.** The test covers 15 months of Binance data published after the Kronos weights: Aug 2025 to Oct 2026,
-10 USDT pairs, {{N_TEST}} asset-days per model.
+**A 2,369-parameter student beats the 28.7M-parameter Kronos model it was trained to copy, and neither beats
+the classical volatility models.** The test covers 15 months of Binance data published after the Kronos
+weights: Aug 2025 to Oct 2026, 10 USDT pairs, {{N_TEST}} asset-days per model.
 
+![Cost against accuracy](results/fig_cost_vs_qlike.png)
+
+* **The student beats its teacher.** The MLP was trained only to imitate pre-test Kronos-small forecasts. On
+  test it scores QLIKE {{Q_STUDENT}} against the teacher's {{Q_KRONOS_SMALL}} (DM {{DM_STUDENT_TEACHER}},
+  {{P_STUDENT_TEACHER}}).
+  * Its forward pass takes {{STUDENT_US}} microseconds, against {{TEACHER_CPU}} CPU-seconds per teacher
+    forecast.
+  * It does not significantly beat HAR (DM {{DM_STUDENT}}, p = {{P_STUDENT}}), and it stays behind log-HAR.
 * **Kronos does not beat HAR-RV.** Zero-shot Kronos variance forecasts, even with a scale fitted on
   validation, score pooled QLIKE {{Q_KRONOS_MINI}} (mini) and {{Q_KRONOS_SMALL}} (small), against
   {{Q_HAR}} for HAR. The DM statistics are {{DM_KRONOS_MINI}} and {{DM_KRONOS_SMALL}} (p = {{P_KRONOS_MINI}} and
@@ -24,14 +33,9 @@ Project 3 of 5 in the quant research series. Every number below is read from `re
   * Dropping that day is a post-hoc reading, not the test. Without it, Kronos edges ahead of HAR, but still
     not significantly (DM {{RDM_MINI}} and {{RDM_SMALL}}). It stays significantly worse than log-HAR. The
     student then beats HAR significantly (DM {{RDM_STUDENT}}).
-* **The surprise is the distillation.** A 2,369-parameter MLP was trained only to imitate pre-test
-  Kronos-small forecasts. On test it beats its 28.7M-parameter teacher: QLIKE {{Q_STUDENT}} against
-  {{Q_KRONOS_SMALL}}, DM {{DM_STUDENT_TEACHER}}, {{P_STUDENT_TEACHER}}.
-  * Its forward pass takes {{STUDENT_US}} microseconds, against {{TEACHER_CPU}} CPU-seconds per teacher
-    forecast.
-  * It does not significantly beat HAR (DM {{DM_STUDENT}}, p = {{P_STUDENT}}), and it stays behind log-HAR.
-* **Answer to the question.** The student keeps, and improves on, whatever Kronos knows about tomorrow's
-  variance. But what Kronos knows is not an edge over the 2009 benchmark.
+* **Answer to the question.** Does Kronos beat HAR-RV after its data cutoff? No. The student keeps, and
+  improves on, whatever Kronos knows about tomorrow's variance, but what Kronos knows is not an edge over the
+  2009 benchmark.
 
 ## Question
 
@@ -149,7 +153,7 @@ scored on those same asset-days.
 
 {{DISTILL}}
 
-![Cost against accuracy](results/fig_cost_vs_qlike.png)
+The cost-against-accuracy figure is under the headline.
 
 ## Compute
 

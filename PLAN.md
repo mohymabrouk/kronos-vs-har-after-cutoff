@@ -252,3 +252,6 @@ student's features/forecast unchanged. 5. Kronos wrapper: shape, determinism, ma
 * **10:45 - report formatting only** (after the test run, so the code hash in the test log predates it):
   CPU cost below the Windows timer floor printed as "<4e-06", the teacher cost labelled "16 paths sampled, first
   8 used", and the extra tables added to `tables.md`/README.
+* **2026-11-22, after publication on GitHub - README wording only:** the headline now leads with the
+  distillation result, and the cost-against-accuracy figure moved under it. The "series" line was removed. Same
+  numbers, same files; no model, test or result changed.

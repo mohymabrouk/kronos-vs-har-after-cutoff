@@ -1,13 +1,22 @@
 # Kronos vs HAR-RV: next-day crypto volatility after the foundation model's data cutoff
 
-Project 3 of 5 in the quant research series. Every number below is read from `results/` by
-`python -m kvh.cli report`; nothing in the tables was typed by hand.
+Every number below is read from `results/` by `python -m kvh.cli report`; nothing in the tables was typed by
+hand.
 
 ## Headline
 
-**No.** The test covers 15 months of Binance data published after the Kronos weights: Aug 2025 to Oct 2026,
-10 USDT pairs, 4,570 asset-days per model.
+**A 2,369-parameter student beats the 28.7M-parameter Kronos model it was trained to copy, and neither beats
+the classical volatility models.** The test covers 15 months of Binance data published after the Kronos
+weights: Aug 2025 to Oct 2026, 10 USDT pairs, 4,570 asset-days per model.
 
+![Cost against accuracy](results/fig_cost_vs_qlike.png)
+
+* **The student beats its teacher.** The MLP was trained only to imitate pre-test Kronos-small forecasts. On
+  test it scores QLIKE 0.581 against the teacher's 0.671 (DM -4.08,
+  p < 0.001).
+  * Its forward pass takes 31 microseconds, against 2.5 CPU-seconds per teacher
+    forecast.
+  * It does not significantly beat HAR (DM -0.55, p = 0.584), and it stays behind log-HAR.
 * **Kronos does not beat HAR-RV.** Zero-shot Kronos variance forecasts, even with a scale fitted on
   validation, score pooled QLIKE 0.680 (mini) and 0.671 (small), against
   0.620 for HAR. The DM statistics are 0.56 and 0.61 (p = 0.579 and
@@ -24,14 +33,9 @@ Project 3 of 5 in the quant research series. Every number below is read from `re
   * Dropping that day is a post-hoc reading, not the test. Without it, Kronos edges ahead of HAR, but still
     not significantly (DM -0.87 and -0.75). It stays significantly worse than log-HAR. The
     student then beats HAR significantly (DM -2.82).
-* **The surprise is the distillation.** A 2,369-parameter MLP was trained only to imitate pre-test
-  Kronos-small forecasts. On test it beats its 28.7M-parameter teacher: QLIKE 0.581 against
-  0.671, DM -4.08, p < 0.001.
-  * Its forward pass takes 31 microseconds, against 2.5 CPU-seconds per teacher
-    forecast.
-  * It does not significantly beat HAR (DM -0.55, p = 0.584), and it stays behind log-HAR.
-* **Answer to the question.** The student keeps, and improves on, whatever Kronos knows about tomorrow's
-  variance. But what Kronos knows is not an edge over the 2009 benchmark.
+* **Answer to the question.** Does Kronos beat HAR-RV after its data cutoff? No. The student keeps, and
+  improves on, whatever Kronos knows about tomorrow's variance, but what Kronos knows is not an edge over the
+  2009 benchmark.
 
 ## Question
 
@@ -225,7 +229,7 @@ scored on those same asset-days.
 | Fidelity: correlation of log forecasts | 0.843 | 1 |  |
 | Fidelity: QLIKE(teacher, student) | 0.3433 | 0 |  |
 
-![Cost against accuracy](results/fig_cost_vs_qlike.png)
+The cost-against-accuracy figure is under the headline.
 
 ## Compute
 
