@@ -1,0 +1,5 @@
+Vendored from https://github.com/shiyu-coder/Kronos (MIT licence, see LICENSE in this folder)
+Commit: 67b630e67f6a18c9e9be918d9b4337c960db1e9a (master, 2026-04-13, "Merge pull request #243")
+Files: model/kronos.py, model/module.py (unchanged except: package-relative import of module.py,
+       removed sys.path hack, tqdm.trange replaced by range). The repo is not pip-installable.
+Weights: HuggingFace NeoQuasar/* at the revisions pinned in src/kvh/config.py (KRONOS_MODELS).
