@@ -1,0 +1,157 @@
+{
+ "config": {
+  "CLIP": 5.0,
+  "CONTEXT_LEN": 488,
+  "DAY_START_HOUR_UTC": 0,
+  "DISTILL_TRAIN_START": "2022-01-01",
+  "EWMA_LAMBDA": 0.94,
+  "FIRST_MONTH": [
+   2020,
+   1
+  ],
+  "GARCH_WINDOW": 1000,
+  "HAR_LAGS": [
+   1,
+   7,
+   30
+  ],
+  "HAR_WINDOW_GRID": [
+   365,
+   730,
+   0
+  ],
+  "KRONOS_DATA_END": "2025-07-01",
+  "KRONOS_MODELS": {
+   "base": [
+    "NeoQuasar/Kronos-base",
+    "2b554741eca47781b64468546e77fef3e85130e6",
+    "NeoQuasar/Kronos-Tokenizer-base",
+    "0e0117387f39004a9016484a186a908917e22426",
+    512
+   ],
+   "mini": [
+    "NeoQuasar/Kronos-mini",
+    "f4e68697d9d5aed55cef5c96aabc3376bcad9f81",
+    "NeoQuasar/Kronos-Tokenizer-2k",
+    "26966d0035065a0cae0ebad7af8ece35bc1fb51c",
+    2048
+   ],
+   "small": [
+    "NeoQuasar/Kronos-small",
+    "901c26c1332695a2a8f243eb2f37243a37bea320",
+    "NeoQuasar/Kronos-Tokenizer-base",
+    "0e0117387f39004a9016484a186a908917e22426",
+    512
+   ]
+  },
+  "KRONOS_PAPER_DATA_END": "2024-06-30",
+  "KRONOS_REPO_COMMIT": "67b630e67f6a18c9e9be918d9b4337c960db1e9a",
+  "KRONOS_WEIGHTS_UPLOADED": "2025-07-01",
+  "LAST_MONTH": [
+   2026,
+   10
+  ],
+  "LGBM_PARAMS": {
+   "bagging_fraction": 0.8,
+   "bagging_freq": 1,
+   "feature_fraction": 0.8,
+   "lambda_l2": 1.0,
+   "learning_rate": 0.03,
+   "min_data_in_leaf": 50,
+   "num_leaves": 15,
+   "num_threads": 2,
+   "objective": "regression",
+   "seed": 20260301,
+   "verbose": -1
+  },
+  "LGBM_ROUNDS": 300,
+  "MAJORS": [
+   "BTCUSDT",
+   "ETHUSDT"
+  ],
+  "MIN_5M_BARS": 260,
+  "PRED_LEN": 24,
+  "SEED": 20260301,
+  "STUDENT_MAX_PARAMS": 100000,
+  "SYMBOLS": [
+   "BTCUSDT",
+   "ETHUSDT",
+   "SOLUSDT",
+   "BNBUSDT",
+   "XRPUSDT",
+   "DOGEUSDT",
+   "ADAUSDT",
+   "LTCUSDT",
+   "LINKUSDT",
+   "TRXUSDT"
+  ],
+  "TEST_END": "2026-10-31",
+  "TEST_START": "2025-08-01",
+  "THREADS": 2,
+  "TRAIN_START": "2020-03-01",
+  "TURBULENT_QUANTILE": 0.8,
+  "VAL_END": "2025-06-30",
+  "VAL_START": "2024-07-01",
+  "VAR_SCALE": 10000.0
+ },
+ "har": {
+  "HAR": 730,
+  "log-HAR": 0
+ },
+ "kronos": {
+  "base": {
+   "n": 8,
+   "scale": 1.2476787236211297,
+   "tag": "T06",
+   "val_forecasts": 122,
+   "val_qlike_cal": 0.40795499880781155,
+   "variant": "park"
+  },
+  "mini": {
+   "n": 16,
+   "scale": 2.308707934616415,
+   "tag": "T09",
+   "val_forecasts": 610,
+   "val_qlike_cal": 0.21690031013338257,
+   "variant": "cc_rec"
+  },
+  "small": {
+   "n": 8,
+   "scale": 1.8606867928848636,
+   "tag": "T06",
+   "val_forecasts": 410,
+   "val_qlike_cal": 0.2519385627789468,
+   "variant": "park"
+  }
+ },
+ "kronos_batch_days": {
+  "base": 1,
+  "mini": 8,
+  "small": 4
+ },
+ "kronos_n_samples": 16,
+ "kronos_tags": {
+  "T06": {
+   "T": 0.6,
+   "top_p": 0.9
+  },
+  "T09": {
+   "T": 0.9,
+   "top_p": 0.9
+  },
+  "T10": {
+   "T": 1.0,
+   "top_p": 1.0
+  }
+ },
+ "student": {
+  "hp": {
+   "epochs": 100,
+   "wd": 0.01,
+   "width": 32
+  },
+  "n_train": 1930,
+  "params": 2369,
+  "scale": 1.8606867928848636
+ }
+}

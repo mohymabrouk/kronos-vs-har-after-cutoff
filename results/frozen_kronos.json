@@ -1,0 +1,26 @@
+{
+ "mini": {
+  "tag": "T09",
+  "variant": "cc_rec",
+  "n": 16,
+  "scale": 2.308707934616415,
+  "val_qlike_cal": 0.21690031013338257,
+  "val_forecasts": 610
+ },
+ "small": {
+  "tag": "T06",
+  "variant": "park",
+  "n": 8,
+  "scale": 1.8606867928848636,
+  "val_qlike_cal": 0.2519385627789468,
+  "val_forecasts": 410
+ },
+ "base": {
+  "tag": "T06",
+  "variant": "park",
+  "n": 8,
+  "scale": 1.2476787236211297,
+  "val_qlike_cal": 0.40795499880781155,
+  "val_forecasts": 122
+ }
+}

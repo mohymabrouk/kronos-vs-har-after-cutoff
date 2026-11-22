@@ -1,0 +1,73 @@
+{
+ "threads": 2,
+ "context": 488,
+ "pred_len": 24,
+ "runs": [
+  {
+   "model": "mini",
+   "params": {
+    "model": 4108032,
+    "tokenizer": 3958042
+   },
+   "n_samples": 16,
+   "batch_days": 8,
+   "wall_s": 0.3023685187508818,
+   "cpu_s": 0.5966796875
+  },
+  {
+   "model": "mini",
+   "params": {
+    "model": 4108032,
+    "tokenizer": 3958042
+   },
+   "n_samples": 32,
+   "batch_days": 4,
+   "wall_s": 0.5964391249945038,
+   "cpu_s": 1.15625
+  },
+  {
+   "model": "small",
+   "params": {
+    "model": 24741376,
+    "tokenizer": 3958042
+   },
+   "n_samples": 16,
+   "batch_days": 4,
+   "wall_s": 1.145355925000331,
+   "cpu_s": 2.23828125
+  },
+  {
+   "model": "small",
+   "params": {
+    "model": 24741376,
+    "tokenizer": 3958042
+   },
+   "n_samples": 32,
+   "batch_days": 2,
+   "wall_s": 2.062190450000344,
+   "cpu_s": 4.01171875
+  },
+  {
+   "model": "base",
+   "params": {
+    "model": 102310592,
+    "tokenizer": 3958042
+   },
+   "n_samples": 16,
+   "batch_days": 1,
+   "wall_s": 3.2331058499985375,
+   "cpu_s": 6.2890625
+  },
+  {
+   "model": "base",
+   "params": {
+    "model": 102310592,
+    "tokenizer": 3958042
+   },
+   "n_samples": 32,
+   "batch_days": 1,
+   "wall_s": 5.318524950009305,
+   "cpu_s": 10.2890625
+  }
+ ]
+}
