@@ -1,0 +1,397 @@
+window,scope,model,mcs_p,in_mcs_10pct
+ttm,pooled,Kronos-small,0.0225,False
+ttm,pooled,HAR,0.0285,False
+ttm,pooled,Kronos-mini,0.0475,False
+ttm,pooled,Student,0.0725,False
+ttm,pooled,log-HAR,0.0725,False
+ttm,pooled,TTM-r2.1 (hourly),0.5105,True
+ttm,pooled,Avg: TTM-r2.1 (hourly) + log-HAR,0.598,True
+ttm,pooled,Avg: TTM-r2.1 (daily RV) + log-HAR,0.693,True
+ttm,pooled,LightGBM,0.987,True
+ttm,pooled,TTM-r2.1 (daily RV),1.0,True
+ttm,ADAUSDT,Kronos-small,0.084,False
+ttm,ADAUSDT,Kronos-mini,0.4165,True
+ttm,ADAUSDT,HAR,0.4165,True
+ttm,ADAUSDT,log-HAR,0.4165,True
+ttm,ADAUSDT,Student,0.4995,True
+ttm,ADAUSDT,Avg: TTM-r2.1 (hourly) + log-HAR,0.63,True
+ttm,ADAUSDT,TTM-r2.1 (hourly),0.703,True
+ttm,ADAUSDT,Avg: TTM-r2.1 (daily RV) + log-HAR,0.703,True
+ttm,ADAUSDT,LightGBM,0.703,True
+ttm,ADAUSDT,TTM-r2.1 (daily RV),1.0,True
+ttm,BNBUSDT,HAR,0.001,False
+ttm,BNBUSDT,Kronos-mini,0.0045,False
+ttm,BNBUSDT,Kronos-small,0.0315,False
+ttm,BNBUSDT,Student,0.176,True
+ttm,BNBUSDT,log-HAR,0.495,True
+ttm,BNBUSDT,TTM-r2.1 (daily RV),0.5855,True
+ttm,BNBUSDT,Avg: TTM-r2.1 (daily RV) + log-HAR,0.6805,True
+ttm,BNBUSDT,LightGBM,0.682,True
+ttm,BNBUSDT,Avg: TTM-r2.1 (hourly) + log-HAR,0.682,True
+ttm,BNBUSDT,TTM-r2.1 (hourly),1.0,True
+ttm,BTCUSDT,Kronos-small,0.0,False
+ttm,BTCUSDT,Student,0.0015,False
+ttm,BTCUSDT,Kronos-mini,0.0025,False
+ttm,BTCUSDT,log-HAR,0.0025,False
+ttm,BTCUSDT,HAR,0.0055,False
+ttm,BTCUSDT,LightGBM,0.0055,False
+ttm,BTCUSDT,Avg: TTM-r2.1 (hourly) + log-HAR,0.0195,False
+ttm,BTCUSDT,Avg: TTM-r2.1 (daily RV) + log-HAR,0.055,False
+ttm,BTCUSDT,TTM-r2.1 (hourly),0.055,False
+ttm,BTCUSDT,TTM-r2.1 (daily RV),1.0,True
+ttm,DOGEUSDT,HAR,0.0025,False
+ttm,DOGEUSDT,Kronos-small,0.0935,False
+ttm,DOGEUSDT,Student,0.5125,True
+ttm,DOGEUSDT,TTM-r2.1 (hourly),0.774,True
+ttm,DOGEUSDT,Avg: TTM-r2.1 (hourly) + log-HAR,0.7895,True
+ttm,DOGEUSDT,Kronos-mini,0.7895,True
+ttm,DOGEUSDT,log-HAR,0.7895,True
+ttm,DOGEUSDT,LightGBM,0.7895,True
+ttm,DOGEUSDT,Avg: TTM-r2.1 (daily RV) + log-HAR,0.7895,True
+ttm,DOGEUSDT,TTM-r2.1 (daily RV),1.0,True
+ttm,ETHUSDT,Kronos-small,0.0055,False
+ttm,ETHUSDT,Student,0.017,False
+ttm,ETHUSDT,Kronos-mini,0.057,False
+ttm,ETHUSDT,LightGBM,0.057,False
+ttm,ETHUSDT,HAR,0.057,False
+ttm,ETHUSDT,log-HAR,0.057,False
+ttm,ETHUSDT,Avg: TTM-r2.1 (hourly) + log-HAR,0.057,False
+ttm,ETHUSDT,Avg: TTM-r2.1 (daily RV) + log-HAR,0.1365,True
+ttm,ETHUSDT,TTM-r2.1 (hourly),0.1365,True
+ttm,ETHUSDT,TTM-r2.1 (daily RV),1.0,True
+ttm,LINKUSDT,Kronos-small,0.202,True
+ttm,LINKUSDT,HAR,0.202,True
+ttm,LINKUSDT,Kronos-mini,0.202,True
+ttm,LINKUSDT,Student,0.352,True
+ttm,LINKUSDT,log-HAR,0.352,True
+ttm,LINKUSDT,Avg: TTM-r2.1 (daily RV) + log-HAR,0.547,True
+ttm,LINKUSDT,Avg: TTM-r2.1 (hourly) + log-HAR,0.782,True
+ttm,LINKUSDT,TTM-r2.1 (daily RV),0.782,True
+ttm,LINKUSDT,LightGBM,0.782,True
+ttm,LINKUSDT,TTM-r2.1 (hourly),1.0,True
+ttm,LTCUSDT,HAR,0.0025,False
+ttm,LTCUSDT,TTM-r2.1 (daily RV),0.639,True
+ttm,LTCUSDT,TTM-r2.1 (hourly),0.684,True
+ttm,LTCUSDT,Kronos-small,0.709,True
+ttm,LTCUSDT,log-HAR,0.709,True
+ttm,LTCUSDT,Avg: TTM-r2.1 (daily RV) + log-HAR,0.709,True
+ttm,LTCUSDT,Avg: TTM-r2.1 (hourly) + log-HAR,0.709,True
+ttm,LTCUSDT,LightGBM,0.709,True
+ttm,LTCUSDT,Student,0.7285,True
+ttm,LTCUSDT,Kronos-mini,1.0,True
+ttm,SOLUSDT,Kronos-small,0.0,False
+ttm,SOLUSDT,Kronos-mini,0.0005,False
+ttm,SOLUSDT,HAR,0.0055,False
+ttm,SOLUSDT,Student,0.0055,False
+ttm,SOLUSDT,log-HAR,0.009,False
+ttm,SOLUSDT,LightGBM,0.0435,False
+ttm,SOLUSDT,Avg: TTM-r2.1 (daily RV) + log-HAR,0.3785,True
+ttm,SOLUSDT,Avg: TTM-r2.1 (hourly) + log-HAR,0.663,True
+ttm,SOLUSDT,TTM-r2.1 (daily RV),0.818,True
+ttm,SOLUSDT,TTM-r2.1 (hourly),1.0,True
+ttm,TRXUSDT,Kronos-small,0.0025,False
+ttm,TRXUSDT,Kronos-mini,0.0835,False
+ttm,TRXUSDT,Student,0.6345,True
+ttm,TRXUSDT,TTM-r2.1 (hourly),0.7315,True
+ttm,TRXUSDT,HAR,0.7315,True
+ttm,TRXUSDT,TTM-r2.1 (daily RV),0.7315,True
+ttm,TRXUSDT,Avg: TTM-r2.1 (hourly) + log-HAR,0.7315,True
+ttm,TRXUSDT,Avg: TTM-r2.1 (daily RV) + log-HAR,0.7315,True
+ttm,TRXUSDT,log-HAR,0.743,True
+ttm,TRXUSDT,LightGBM,1.0,True
+ttm,XRPUSDT,Kronos-small,0.0645,False
+ttm,XRPUSDT,Kronos-mini,0.1935,True
+ttm,XRPUSDT,Student,0.418,True
+ttm,XRPUSDT,HAR,0.418,True
+ttm,XRPUSDT,Avg: TTM-r2.1 (daily RV) + log-HAR,0.418,True
+ttm,XRPUSDT,log-HAR,0.418,True
+ttm,XRPUSDT,TTM-r2.1 (daily RV),0.418,True
+ttm,XRPUSDT,Avg: TTM-r2.1 (hourly) + log-HAR,0.418,True
+ttm,XRPUSDT,LightGBM,0.763,True
+ttm,XRPUSDT,TTM-r2.1 (hourly),1.0,True
+timesfm,pooled,HAR,0.021,False
+timesfm,pooled,Kronos-small,0.0265,False
+timesfm,pooled,Kronos-mini,0.059,False
+timesfm,pooled,Student,0.144,True
+timesfm,pooled,log-HAR,0.144,True
+timesfm,pooled,Avg: TTM-r2.1 (daily RV) + log-HAR,0.308,True
+timesfm,pooled,TTM-r2.1 (daily RV),0.3385,True
+timesfm,pooled,TTM-r2.1 (hourly),0.3385,True
+timesfm,pooled,LightGBM,0.3385,True
+timesfm,pooled,Avg: TTM-r2.1 (hourly) + log-HAR,0.3385,True
+timesfm,pooled,TimesFM-2.5 (daily RV),0.6315,True
+timesfm,pooled,TimesFM-2.5 (hourly),1.0,True
+timesfm,ADAUSDT,Kronos-small,0.111,True
+timesfm,ADAUSDT,Kronos-mini,0.44,True
+timesfm,ADAUSDT,HAR,0.44,True
+timesfm,ADAUSDT,log-HAR,0.44,True
+timesfm,ADAUSDT,Student,0.4965,True
+timesfm,ADAUSDT,Avg: TTM-r2.1 (daily RV) + log-HAR,0.4965,True
+timesfm,ADAUSDT,Avg: TTM-r2.1 (hourly) + log-HAR,0.611,True
+timesfm,ADAUSDT,LightGBM,0.611,True
+timesfm,ADAUSDT,TTM-r2.1 (hourly),0.611,True
+timesfm,ADAUSDT,TTM-r2.1 (daily RV),0.611,True
+timesfm,ADAUSDT,TimesFM-2.5 (daily RV),0.611,True
+timesfm,ADAUSDT,TimesFM-2.5 (hourly),1.0,True
+timesfm,BNBUSDT,HAR,0.0005,False
+timesfm,BNBUSDT,Kronos-mini,0.0055,False
+timesfm,BNBUSDT,Kronos-small,0.0365,False
+timesfm,BNBUSDT,Student,0.2035,True
+timesfm,BNBUSDT,log-HAR,0.2035,True
+timesfm,BNBUSDT,Avg: TTM-r2.1 (daily RV) + log-HAR,0.449,True
+timesfm,BNBUSDT,TTM-r2.1 (daily RV),0.636,True
+timesfm,BNBUSDT,LightGBM,0.636,True
+timesfm,BNBUSDT,Avg: TTM-r2.1 (hourly) + log-HAR,0.636,True
+timesfm,BNBUSDT,TTM-r2.1 (hourly),0.636,True
+timesfm,BNBUSDT,TimesFM-2.5 (hourly),0.636,True
+timesfm,BNBUSDT,TimesFM-2.5 (daily RV),1.0,True
+timesfm,BTCUSDT,Kronos-small,0.0,False
+timesfm,BTCUSDT,Student,0.005,False
+timesfm,BTCUSDT,Kronos-mini,0.005,False
+timesfm,BTCUSDT,log-HAR,0.005,False
+timesfm,BTCUSDT,LightGBM,0.005,False
+timesfm,BTCUSDT,Avg: TTM-r2.1 (hourly) + log-HAR,0.005,False
+timesfm,BTCUSDT,HAR,0.0055,False
+timesfm,BTCUSDT,Avg: TTM-r2.1 (daily RV) + log-HAR,0.0055,False
+timesfm,BTCUSDT,TTM-r2.1 (hourly),0.0055,False
+timesfm,BTCUSDT,TTM-r2.1 (daily RV),0.184,True
+timesfm,BTCUSDT,TimesFM-2.5 (hourly),0.305,True
+timesfm,BTCUSDT,TimesFM-2.5 (daily RV),1.0,True
+timesfm,DOGEUSDT,HAR,0.0005,False
+timesfm,DOGEUSDT,Kronos-small,0.1055,True
+timesfm,DOGEUSDT,Student,0.527,True
+timesfm,DOGEUSDT,log-HAR,0.527,True
+timesfm,DOGEUSDT,TTM-r2.1 (hourly),0.731,True
+timesfm,DOGEUSDT,Kronos-mini,0.731,True
+timesfm,DOGEUSDT,Avg: TTM-r2.1 (daily RV) + log-HAR,0.731,True
+timesfm,DOGEUSDT,LightGBM,0.731,True
+timesfm,DOGEUSDT,TTM-r2.1 (daily RV),0.731,True
+timesfm,DOGEUSDT,Avg: TTM-r2.1 (hourly) + log-HAR,0.731,True
+timesfm,DOGEUSDT,TimesFM-2.5 (daily RV),0.731,True
+timesfm,DOGEUSDT,TimesFM-2.5 (hourly),1.0,True
+timesfm,ETHUSDT,Kronos-small,0.011,False
+timesfm,ETHUSDT,Student,0.021,False
+timesfm,ETHUSDT,Kronos-mini,0.099,False
+timesfm,ETHUSDT,LightGBM,0.099,False
+timesfm,ETHUSDT,log-HAR,0.099,False
+timesfm,ETHUSDT,HAR,0.099,False
+timesfm,ETHUSDT,Avg: TTM-r2.1 (hourly) + log-HAR,0.099,False
+timesfm,ETHUSDT,Avg: TTM-r2.1 (daily RV) + log-HAR,0.099,False
+timesfm,ETHUSDT,TTM-r2.1 (hourly),0.099,False
+timesfm,ETHUSDT,TTM-r2.1 (daily RV),0.213,True
+timesfm,ETHUSDT,TimesFM-2.5 (hourly),0.213,True
+timesfm,ETHUSDT,TimesFM-2.5 (daily RV),1.0,True
+timesfm,LINKUSDT,HAR,0.1105,True
+timesfm,LINKUSDT,Kronos-small,0.1105,True
+timesfm,LINKUSDT,Kronos-mini,0.172,True
+timesfm,LINKUSDT,log-HAR,0.172,True
+timesfm,LINKUSDT,Student,0.4405,True
+timesfm,LINKUSDT,LightGBM,0.4405,True
+timesfm,LINKUSDT,Avg: TTM-r2.1 (daily RV) + log-HAR,0.4405,True
+timesfm,LINKUSDT,TTM-r2.1 (daily RV),0.4405,True
+timesfm,LINKUSDT,Avg: TTM-r2.1 (hourly) + log-HAR,0.4405,True
+timesfm,LINKUSDT,TTM-r2.1 (hourly),0.4405,True
+timesfm,LINKUSDT,TimesFM-2.5 (daily RV),0.5405,True
+timesfm,LINKUSDT,TimesFM-2.5 (hourly),1.0,True
+timesfm,LTCUSDT,HAR,0.0015,False
+timesfm,LTCUSDT,TTM-r2.1 (daily RV),0.64,True
+timesfm,LTCUSDT,TTM-r2.1 (hourly),0.6475,True
+timesfm,LTCUSDT,Avg: TTM-r2.1 (daily RV) + log-HAR,0.7145,True
+timesfm,LTCUSDT,Avg: TTM-r2.1 (hourly) + log-HAR,0.7495,True
+timesfm,LTCUSDT,Kronos-small,0.7495,True
+timesfm,LTCUSDT,log-HAR,0.7495,True
+timesfm,LTCUSDT,TimesFM-2.5 (daily RV),0.7495,True
+timesfm,LTCUSDT,LightGBM,0.7495,True
+timesfm,LTCUSDT,TimesFM-2.5 (hourly),0.7495,True
+timesfm,LTCUSDT,Student,0.7545,True
+timesfm,LTCUSDT,Kronos-mini,1.0,True
+timesfm,SOLUSDT,Kronos-small,0.0,False
+timesfm,SOLUSDT,Kronos-mini,0.001,False
+timesfm,SOLUSDT,HAR,0.0065,False
+timesfm,SOLUSDT,Student,0.0105,False
+timesfm,SOLUSDT,log-HAR,0.045,False
+timesfm,SOLUSDT,LightGBM,0.0695,False
+timesfm,SOLUSDT,Avg: TTM-r2.1 (daily RV) + log-HAR,0.3515,True
+timesfm,SOLUSDT,TTM-r2.1 (daily RV),0.54,True
+timesfm,SOLUSDT,Avg: TTM-r2.1 (hourly) + log-HAR,0.54,True
+timesfm,SOLUSDT,TTM-r2.1 (hourly),0.658,True
+timesfm,SOLUSDT,TimesFM-2.5 (hourly),0.7385,True
+timesfm,SOLUSDT,TimesFM-2.5 (daily RV),1.0,True
+timesfm,TRXUSDT,Kronos-small,0.0015,False
+timesfm,TRXUSDT,Kronos-mini,0.084,False
+timesfm,TRXUSDT,Student,0.628,True
+timesfm,TRXUSDT,TTM-r2.1 (hourly),0.711,True
+timesfm,TRXUSDT,HAR,0.711,True
+timesfm,TRXUSDT,TTM-r2.1 (daily RV),0.711,True
+timesfm,TRXUSDT,Avg: TTM-r2.1 (hourly) + log-HAR,0.711,True
+timesfm,TRXUSDT,TimesFM-2.5 (hourly),0.711,True
+timesfm,TRXUSDT,Avg: TTM-r2.1 (daily RV) + log-HAR,0.711,True
+timesfm,TRXUSDT,log-HAR,0.722,True
+timesfm,TRXUSDT,LightGBM,0.722,True
+timesfm,TRXUSDT,TimesFM-2.5 (daily RV),1.0,True
+timesfm,XRPUSDT,Kronos-small,0.0205,False
+timesfm,XRPUSDT,Kronos-mini,0.1605,True
+timesfm,XRPUSDT,HAR,0.1955,True
+timesfm,XRPUSDT,log-HAR,0.1955,True
+timesfm,XRPUSDT,Student,0.1955,True
+timesfm,XRPUSDT,Avg: TTM-r2.1 (daily RV) + log-HAR,0.1955,True
+timesfm,XRPUSDT,TTM-r2.1 (daily RV),0.1955,True
+timesfm,XRPUSDT,Avg: TTM-r2.1 (hourly) + log-HAR,0.1955,True
+timesfm,XRPUSDT,TTM-r2.1 (hourly),0.268,True
+timesfm,XRPUSDT,LightGBM,0.2915,True
+timesfm,XRPUSDT,TimesFM-2.5 (daily RV),0.531,True
+timesfm,XRPUSDT,TimesFM-2.5 (hourly),1.0,True
+chronos2,pooled,Kronos-small,0.0,False
+chronos2,pooled,HAR,0.0,False
+chronos2,pooled,Kronos-mini,0.002,False
+chronos2,pooled,Student,0.013,False
+chronos2,pooled,log-HAR,0.232,True
+chronos2,pooled,TTM-r2.1 (daily RV),0.779,True
+chronos2,pooled,Chronos-2 (hourly),0.779,True
+chronos2,pooled,Avg: TTM-r2.1 (daily RV) + log-HAR,0.779,True
+chronos2,pooled,LightGBM,0.779,True
+chronos2,pooled,Avg: TTM-r2.1 (hourly) + log-HAR,0.779,True
+chronos2,pooled,TTM-r2.1 (hourly),0.779,True
+chronos2,pooled,TimesFM-2.5 (hourly),0.779,True
+chronos2,pooled,Chronos-2 (daily RV),0.779,True
+chronos2,pooled,TimesFM-2.5 (daily RV),1.0,True
+chronos2,ADAUSDT,HAR,0.0,False
+chronos2,ADAUSDT,Kronos-small,0.003,False
+chronos2,ADAUSDT,Kronos-mini,0.003,False
+chronos2,ADAUSDT,TTM-r2.1 (daily RV),0.6985,True
+chronos2,ADAUSDT,Chronos-2 (hourly),0.7655,True
+chronos2,ADAUSDT,LightGBM,0.7655,True
+chronos2,ADAUSDT,log-HAR,0.7655,True
+chronos2,ADAUSDT,Avg: TTM-r2.1 (daily RV) + log-HAR,0.7655,True
+chronos2,ADAUSDT,Student,0.7655,True
+chronos2,ADAUSDT,Chronos-2 (daily RV),0.7655,True
+chronos2,ADAUSDT,TimesFM-2.5 (hourly),0.7655,True
+chronos2,ADAUSDT,Avg: TTM-r2.1 (hourly) + log-HAR,0.7655,True
+chronos2,ADAUSDT,TTM-r2.1 (hourly),0.7655,True
+chronos2,ADAUSDT,TimesFM-2.5 (daily RV),1.0,True
+chronos2,BNBUSDT,HAR,0.0,False
+chronos2,BNBUSDT,Kronos-mini,0.001,False
+chronos2,BNBUSDT,Student,0.0965,False
+chronos2,BNBUSDT,Kronos-small,0.1095,True
+chronos2,BNBUSDT,log-HAR,0.291,True
+chronos2,BNBUSDT,LightGBM,0.2985,True
+chronos2,BNBUSDT,TTM-r2.1 (daily RV),0.618,True
+chronos2,BNBUSDT,Avg: TTM-r2.1 (daily RV) + log-HAR,0.618,True
+chronos2,BNBUSDT,Chronos-2 (hourly),0.63,True
+chronos2,BNBUSDT,Avg: TTM-r2.1 (hourly) + log-HAR,0.842,True
+chronos2,BNBUSDT,TTM-r2.1 (hourly),0.898,True
+chronos2,BNBUSDT,TimesFM-2.5 (hourly),0.898,True
+chronos2,BNBUSDT,Chronos-2 (daily RV),0.898,True
+chronos2,BNBUSDT,TimesFM-2.5 (daily RV),1.0,True
+chronos2,BTCUSDT,Kronos-small,0.0,False
+chronos2,BTCUSDT,Kronos-mini,0.0,False
+chronos2,BTCUSDT,HAR,0.0,False
+chronos2,BTCUSDT,Student,0.001,False
+chronos2,BTCUSDT,log-HAR,0.001,False
+chronos2,BTCUSDT,LightGBM,0.001,False
+chronos2,BTCUSDT,Avg: TTM-r2.1 (hourly) + log-HAR,0.001,False
+chronos2,BTCUSDT,Avg: TTM-r2.1 (daily RV) + log-HAR,0.0075,False
+chronos2,BTCUSDT,TTM-r2.1 (hourly),0.0075,False
+chronos2,BTCUSDT,TTM-r2.1 (daily RV),0.3205,True
+chronos2,BTCUSDT,TimesFM-2.5 (hourly),0.618,True
+chronos2,BTCUSDT,Chronos-2 (hourly),0.618,True
+chronos2,BTCUSDT,Chronos-2 (daily RV),0.618,True
+chronos2,BTCUSDT,TimesFM-2.5 (daily RV),1.0,True
+chronos2,DOGEUSDT,HAR,0.0,False
+chronos2,DOGEUSDT,Kronos-small,0.006,False
+chronos2,DOGEUSDT,Kronos-mini,0.049,False
+chronos2,DOGEUSDT,Student,0.458,True
+chronos2,DOGEUSDT,TTM-r2.1 (daily RV),0.458,True
+chronos2,DOGEUSDT,log-HAR,0.6085,True
+chronos2,DOGEUSDT,Avg: TTM-r2.1 (daily RV) + log-HAR,0.6085,True
+chronos2,DOGEUSDT,LightGBM,0.8695,True
+chronos2,DOGEUSDT,Chronos-2 (hourly),0.8695,True
+chronos2,DOGEUSDT,Chronos-2 (daily RV),0.9585,True
+chronos2,DOGEUSDT,TimesFM-2.5 (hourly),0.9585,True
+chronos2,DOGEUSDT,Avg: TTM-r2.1 (hourly) + log-HAR,0.9585,True
+chronos2,DOGEUSDT,TTM-r2.1 (hourly),0.9585,True
+chronos2,DOGEUSDT,TimesFM-2.5 (daily RV),1.0,True
+chronos2,ETHUSDT,Kronos-small,0.0325,False
+chronos2,ETHUSDT,Student,0.04,False
+chronos2,ETHUSDT,Kronos-mini,0.1035,True
+chronos2,ETHUSDT,HAR,0.1035,True
+chronos2,ETHUSDT,LightGBM,0.1035,True
+chronos2,ETHUSDT,log-HAR,0.1035,True
+chronos2,ETHUSDT,Avg: TTM-r2.1 (hourly) + log-HAR,0.2915,True
+chronos2,ETHUSDT,Chronos-2 (hourly),0.4925,True
+chronos2,ETHUSDT,Avg: TTM-r2.1 (daily RV) + log-HAR,0.4925,True
+chronos2,ETHUSDT,TTM-r2.1 (hourly),0.4925,True
+chronos2,ETHUSDT,TimesFM-2.5 (hourly),0.4925,True
+chronos2,ETHUSDT,TTM-r2.1 (daily RV),0.4925,True
+chronos2,ETHUSDT,Chronos-2 (daily RV),0.4925,True
+chronos2,ETHUSDT,TimesFM-2.5 (daily RV),1.0,True
+chronos2,LINKUSDT,HAR,0.0,False
+chronos2,LINKUSDT,Kronos-small,0.0015,False
+chronos2,LINKUSDT,Kronos-mini,0.0015,False
+chronos2,LINKUSDT,LightGBM,0.0065,False
+chronos2,LINKUSDT,Student,0.171,True
+chronos2,LINKUSDT,log-HAR,0.25,True
+chronos2,LINKUSDT,TTM-r2.1 (daily RV),0.3955,True
+chronos2,LINKUSDT,Avg: TTM-r2.1 (daily RV) + log-HAR,0.5515,True
+chronos2,LINKUSDT,Chronos-2 (daily RV),0.868,True
+chronos2,LINKUSDT,TimesFM-2.5 (hourly),0.8785,True
+chronos2,LINKUSDT,Avg: TTM-r2.1 (hourly) + log-HAR,0.907,True
+chronos2,LINKUSDT,Chronos-2 (hourly),0.963,True
+chronos2,LINKUSDT,TimesFM-2.5 (daily RV),0.963,True
+chronos2,LINKUSDT,TTM-r2.1 (hourly),1.0,True
+chronos2,LTCUSDT,HAR,0.0,False
+chronos2,LTCUSDT,Kronos-small,0.003,False
+chronos2,LTCUSDT,Kronos-mini,0.005,False
+chronos2,LTCUSDT,LightGBM,0.069,False
+chronos2,LTCUSDT,TTM-r2.1 (daily RV),0.3855,True
+chronos2,LTCUSDT,log-HAR,0.3965,True
+chronos2,LTCUSDT,Avg: TTM-r2.1 (daily RV) + log-HAR,0.483,True
+chronos2,LTCUSDT,Chronos-2 (daily RV),0.904,True
+chronos2,LTCUSDT,Student,0.904,True
+chronos2,LTCUSDT,Chronos-2 (hourly),0.904,True
+chronos2,LTCUSDT,Avg: TTM-r2.1 (hourly) + log-HAR,0.904,True
+chronos2,LTCUSDT,TimesFM-2.5 (hourly),0.904,True
+chronos2,LTCUSDT,TTM-r2.1 (hourly),0.904,True
+chronos2,LTCUSDT,TimesFM-2.5 (daily RV),1.0,True
+chronos2,SOLUSDT,Kronos-small,0.0,False
+chronos2,SOLUSDT,HAR,0.0165,False
+chronos2,SOLUSDT,Kronos-mini,0.0165,False
+chronos2,SOLUSDT,Student,0.0515,False
+chronos2,SOLUSDT,log-HAR,0.4475,True
+chronos2,SOLUSDT,LightGBM,0.516,True
+chronos2,SOLUSDT,Avg: TTM-r2.1 (daily RV) + log-HAR,0.961,True
+chronos2,SOLUSDT,TimesFM-2.5 (hourly),0.961,True
+chronos2,SOLUSDT,Chronos-2 (daily RV),0.961,True
+chronos2,SOLUSDT,TTM-r2.1 (daily RV),0.961,True
+chronos2,SOLUSDT,Chronos-2 (hourly),0.961,True
+chronos2,SOLUSDT,Avg: TTM-r2.1 (hourly) + log-HAR,0.961,True
+chronos2,SOLUSDT,TTM-r2.1 (hourly),0.961,True
+chronos2,SOLUSDT,TimesFM-2.5 (daily RV),1.0,True
+chronos2,TRXUSDT,Kronos-small,0.005,False
+chronos2,TRXUSDT,Kronos-mini,0.0815,False
+chronos2,TRXUSDT,Student,0.6105,True
+chronos2,TRXUSDT,Chronos-2 (hourly),0.6955,True
+chronos2,TRXUSDT,TTM-r2.1 (hourly),0.6955,True
+chronos2,TRXUSDT,HAR,0.6955,True
+chronos2,TRXUSDT,TTM-r2.1 (daily RV),0.6955,True
+chronos2,TRXUSDT,Avg: TTM-r2.1 (hourly) + log-HAR,0.71,True
+chronos2,TRXUSDT,TimesFM-2.5 (hourly),0.71,True
+chronos2,TRXUSDT,Avg: TTM-r2.1 (daily RV) + log-HAR,0.7135,True
+chronos2,TRXUSDT,log-HAR,0.7535,True
+chronos2,TRXUSDT,LightGBM,0.7535,True
+chronos2,TRXUSDT,Chronos-2 (daily RV),0.7535,True
+chronos2,TRXUSDT,TimesFM-2.5 (daily RV),1.0,True
+chronos2,XRPUSDT,HAR,0.0,False
+chronos2,XRPUSDT,Kronos-small,0.0095,False
+chronos2,XRPUSDT,Kronos-mini,0.0095,False
+chronos2,XRPUSDT,Student,0.1215,True
+chronos2,XRPUSDT,Avg: TTM-r2.1 (daily RV) + log-HAR,0.1215,True
+chronos2,XRPUSDT,log-HAR,0.1215,True
+chronos2,XRPUSDT,TTM-r2.1 (daily RV),0.34,True
+chronos2,XRPUSDT,Avg: TTM-r2.1 (hourly) + log-HAR,0.422,True
+chronos2,XRPUSDT,Chronos-2 (daily RV),0.8245,True
+chronos2,XRPUSDT,TTM-r2.1 (hourly),0.8245,True
+chronos2,XRPUSDT,LightGBM,0.9235,True
+chronos2,XRPUSDT,TimesFM-2.5 (hourly),0.9235,True
+chronos2,XRPUSDT,Chronos-2 (hourly),0.999,True
+chronos2,XRPUSDT,TimesFM-2.5 (daily RV),1.0,True

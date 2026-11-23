@@ -1,0 +1,51 @@
+{
+ "params": {
+  "ttm": 855100,
+  "timesfm": 231289280,
+  "chronos2": 119477664
+ },
+ "test": {
+  "TTM-r2.1 (hourly)": {
+   "cpu_s": 0.001900984682713348,
+   "wall_s": 0.0022776577462487054,
+   "forecasts": 4570,
+   "floored": 0,
+   "negative_points": 0
+  },
+  "TTM-r2.1 (daily RV)": {
+   "cpu_s": 0.0018394420131291028,
+   "wall_s": 0.002291132385268832,
+   "forecasts": 4570,
+   "floored": 0,
+   "negative_points": 0
+  },
+  "TimesFM-2.5 (hourly)": {
+   "cpu_s": 0.3730340189873418,
+   "wall_s": 0.26628261326570535,
+   "forecasts": 3950,
+   "floored": 0,
+   "negative_points": 0
+  },
+  "TimesFM-2.5 (daily RV)": {
+   "cpu_s": 0.7811115506329114,
+   "wall_s": 0.6119974565569641,
+   "forecasts": 3950,
+   "floored": 0,
+   "negative_points": 0
+  },
+  "Chronos-2 (hourly)": {
+   "cpu_s": 0.200390625,
+   "wall_s": 0.16364314020829623,
+   "forecasts": 3360,
+   "floored": 0,
+   "negative_points": 0
+  },
+  "Chronos-2 (daily RV)": {
+   "cpu_s": 0.3944521949404762,
+   "wall_s": 0.2918000502679206,
+   "forecasts": 3360,
+   "floored": 0,
+   "negative_points": 0
+  }
+ }
+}

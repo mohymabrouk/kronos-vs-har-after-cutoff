@@ -1,0 +1,7 @@
+{
+ "source": "arXiv 2607.05291v2 (2026-11-20), Table 16: forecast combinations of TTM, Log-HAR and ARMA; 50 VOLARE assets (equities, currencies, futures); zero-shot TTM 512-96-ft-r2.1 on daily sqrt(RV), 512 days of context",
+ "horizon": 1,
+ "qlike_ratio_to_log_har": {"log-HAR": 1.000, "TTM": 0.984, "TTM + log-HAR (equal weight)": 0.978},
+ "mcs_inclusion_pct_of_assets": {"log-HAR": 58.0, "TTM": 90.0, "TTM + log-HAR (equal weight)": 100.0},
+ "n_assets": 50
+}
