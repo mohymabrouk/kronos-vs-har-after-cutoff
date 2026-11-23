@@ -29,15 +29,17 @@ def set_threads() -> None:
 
 def main(argv=None) -> None:
     p = argparse.ArgumentParser(prog="kvh")
-    p.add_argument("stage", choices=["download", "build", "throughput", "kronos", "validate", "distill", "freeze", "test", "report"])
-    p.add_argument("--force", action="store_true", help="test stage: allow a second (logged) test run")
-    p.add_argument("--models", default="mini,small", help="kronos stage: comma-separated Kronos sizes")
-    p.add_argument("--symbols", default=None, help="kronos stage: comma-separated symbols (default: all)")
-    p.add_argument("--period", default="val", help="kronos stage: val | test | distill | slice")
+    p.add_argument("stage", choices=["download", "build", "throughput", "kronos", "validate", "distill", "freeze", "test", "report",
+                                     "tsfm", "tsfm-validate", "tsfm-test"])
+    p.add_argument("--force", action="store_true", help="test / tsfm-test stage: allow a second (logged) run")
+    p.add_argument("--models", default=None, help="kronos stage: Kronos sizes (default mini,small); tsfm stage: ttm,timesfm,chronos2")
+    p.add_argument("--symbols", default=None, help="kronos / tsfm stage: comma-separated symbols (default: all)")
+    p.add_argument("--period", default="val", help="kronos stage: val | test | distill | slice; tsfm stage: val | test")
     p.add_argument("--tag", default=None, help="kronos stage: sampling-setting tag from config (default: frozen)")
     p.add_argument("--stride", type=int, default=1, help="kronos stage: forecast every k-th day")
+    p.add_argument("--specs", default="H,D", help="tsfm stage: input specifications (PLAN.md 13.2)")
     a = p.parse_args(argv)
-    setup_logging(a.stage if a.stage != "kronos" else f"kronos_{a.period}")
+    setup_logging(f"{a.stage}_{a.period}" if a.stage in ("kronos", "tsfm") else a.stage)
     set_threads()
     if a.stage == "download":
         from kvh import download
@@ -51,7 +53,17 @@ def main(argv=None) -> None:
     elif a.stage == "kronos":
         from kvh import kronos_run
         syms = a.symbols.split(",") if a.symbols else None
-        kronos_run.run(models=a.models.split(","), symbols=syms, period=a.period, tag=a.tag, stride=a.stride)
+        kronos_run.run(models=(a.models or "mini,small").split(","), symbols=syms, period=a.period, tag=a.tag, stride=a.stride)
+    elif a.stage == "tsfm":
+        from kvh import tsfm
+        syms = a.symbols.split(",") if a.symbols else None
+        tsfm.run(models=(a.models or ",".join(config.TSFM_MODELS)).split(","), period=a.period, specs=a.specs.split(","), symbols=syms)
+    elif a.stage == "tsfm-validate":
+        from kvh import tsfm_eval
+        tsfm_eval.validate()
+    elif a.stage == "tsfm-test":
+        from kvh import tsfm_eval
+        tsfm_eval.test(force=a.force)
     elif a.stage == "validate":
         from kvh import pipeline
         pipeline.validate()

@@ -70,3 +70,31 @@ THREADS = 2
 
 # ---- distillation student -----------------------------------------------------------------------------
 STUDENT_MAX_PARAMS = 100_000
+
+# ---- newer time-series foundation models, added after the original test (PLAN.md section 13) --------------------
+# Not part of the original frozen config (results/frozen_config.json was written before these lines existed); the
+# extension has its own frozen file, results/frozen_tsfm.json. weights_date = commit date of the first upload of
+# the weights used (HF API, checked by LFS object id); stated_data_end = latest dated training source on the model
+# card (None if the card states no date).
+TSFM_EMBARGO_MONTHS = 1  # as for Kronos: cutoff 2025-07-01 -> TEST_START 2025-08-01
+TSFM_MODELS = {
+    "ttm": dict(label="TTM-r2.1", repo="ibm-granite/granite-timeseries-ttm-r2", branch="512-96-ft-r2.1",
+                revision="a23813d5e5859987e522d084f7d1d1ef9f134c3e", weights_date=date(2025, 1, 31),
+                stated_data_end=None, context_h=512, context_d=512,
+                data_note="no date stated; fixed public datasets (Monash/Zenodo, LOTSA subsets), incl. a Bitcoin set ending 2021",
+                weights_sha256="37fa184887f260cda022d3ae9f1c642fdba579d0aefeabdf751f83f45383a761"),
+    "timesfm": dict(label="TimesFM-2.5", repo="google/timesfm-2.5-200m-pytorch", branch="main",
+                    revision="d418f3e8a8fa79d655b391c158f0ee8d68fe68c9", weights_date=date(2025, 9, 2),
+                    stated_data_end=date(2023, 11, 30), context_h=488, context_d=1000,
+                    data_note="Wikimedia pageviews to Nov 2023, Google Trends to end-2022, GiftEvalPretrain, synthetic",
+                    weights_sha256="2f776efe6245e42b24bc4153ffdf61810140210e4bd3b01fb21f7aa779ab6ce8"),
+    "chronos2": dict(label="Chronos-2", repo="amazon/chronos-2", branch="main",
+                     revision="95a9710e2596287d08352589f42634fa5abdf0a7", weights_date=date(2025, 10, 30),
+                     stated_data_end=None, context_h=488, context_d=1000,
+                     data_note="no date stated; subsets of Chronos datasets and GIFT-Eval Pretrain, synthetic",
+                     weights_sha256="ddcda3c7508bf2528087723e98a20707cc04b7f370ae275a9fd88078ddba4f42"),
+}
+TSFM_SPECS = ("H", "D")  # H: Kronos-matched hourly candles; D: daily sqrt(RV), as in arXiv 2607.05291
+TSFM_H_VARIANTS = ("cc", "park")
+TSFM_FLOOR = 1e-10  # raw variance floor (the data-build floor)
+CRASH_DAY = date(2025, 10, 10)
