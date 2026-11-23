@@ -255,3 +255,99 @@ student's features/forecast unchanged. 5. Kronos wrapper: shape, determinism, ma
 * **2026-11-22, after publication on GitHub - README wording only:** the headline now leads with the
   distillation result, and the cost-against-accuracy figure moved under it. The "series" line was removed. Same
   numbers, same files; no model, test or result changed.
+
+## 13. Change E1 (declared 2026-11-23, before any forecast of the new models): three newer foundation models, each scored only after its release
+
+Written before the TSFM code and before any forecast (validation or test) of these models. Nothing in sections
+1-12 changes: the original test run (results/test_log.jsonl run 1) and its files stay as they are.
+
+### 13.1 Models, pinned weights and the dates that bound their training data
+
+Evidence: HuggingFace API `/api/models/<repo>/commits/<branch>` and `/tree/<revision>` (LFS object id of every
+file), and each model card, read 2026-11-23.
+
+| Model | Repo, branch | Pinned revision (the commit that uploaded the weights used) | Weights date | Later commits | Training data stated on the card |
+|---|---|---|---|---|---|
+| TTM (r2.1 release) | `ibm-granite/granite-timeseries-ttm-r2`, branch `512-96-ft-r2.1` (the checkpoint 2607.05291 uses) | `a23813d5e5859987e522d084f7d1d1ef9f134c3e` | 2025-01-31 | branch head `3442406f` (2025-02-26) has the same `model.safetensors` and `config.json` objects | fixed public datasets (Monash/Zenodo collections, LOTSA subsets, PEMS...), including the Monash "Bitcoin" set that ends in 2021; no date cutoff stated |
+| TimesFM-2.5 | `google/timesfm-2.5-200m-pytorch`, main | `d418f3e8a8fa79d655b391c158f0ee8d68fe68c9` (2025-10-01, "Refreshed model with speed optimizations": fused QKV) | **2025-09-02** (first upload `d35e0e45`) | checked: the 2025-10-01 file is the 2025-09-02 file with query/key/value concatenated, 232 of 232 tensors bit-identical; later commits edit the README only | GiftEvalPretrain; Wikimedia pageviews "cutoff Nov 2023"; Google Trends "cutoff EoY 2022"; synthetic data |
+| Chronos-2 | `amazon/chronos-2`, main | `95a9710e2596287d08352589f42634fa5abdf0a7` ("Add model weights and config", 2025-10-30) | 2025-10-30 | `model.safetensors` and `config.json` keep the same object ids at every later commit up to main `29ec3766` (2026-06-05); the later commits edit the README and tags | subsets of Chronos datasets and GIFT-Eval Pretrain, synthetic data; no date cutoff stated |
+
+All three are Apache 2.0. The weights date is an upper bound on the end of the training data. Effective cutoff =
+the later of the weights date and the latest dated source on the card (TimesFM: Nov 2023 < 2025-09-02, so the
+weights date). **Scoring start = max(TEST_START, effective cutoff + one calendar month)**, the convention of the
+Kronos test (2025-07-01 + one month = 2025-08-01). Hence:
+
+| Model | Effective cutoff | Scoring start | Test days | Contains 2025-10-10 |
+|---|---|---|---|---|
+| TTM | 2025-01-31 | 2025-08-01 (whole test) | 457 | yes |
+| TimesFM-2.5 | 2025-09-02 | 2025-10-02 | 395 | yes |
+| Chronos-2 | 2025-10-30 | 2025-11-30 | 336 | no |
+
+Test-period forecasts of a model are generated only from its scoring start. A pytest checks the dates.
+
+### 13.2 Input, output and variance forecast (zero-shot, nothing fine-tuned)
+
+Two input specifications, both pre-declared and both reported:
+
+* **H, Kronos-matched (the primary specification).** The same hourly candles Kronos sees at 00:00 UTC of day d:
+  the last 488 hourly candles (TimesFM-2.5: 488 values, left-padded and masked to 512 by its own API;
+  Chronos-2: 488). TTM's checkpoint has a fixed context of 512, so it gets the last 512 candles (24 older
+  hours, all closed before the forecast time). The three models are univariate, so the candles are turned into
+  an hourly volatility series, in one of two variants (as Kronos's close-to-close / Parkinson):
+  * `cc`: |log C_h - log C_{h-1}| (the first hour uses its own open);
+  * `park`: ln(H_h / L_h) / (2 sqrt(ln 2)), the square root of the hourly Parkinson variance.
+  The model forecasts the next 24 hourly values s_h; raw daily variance = sum over the 24 hours of max(s_h, 0)^2.
+  The variant is chosen on validation (calibrated QLIKE), as the Kronos variant was.
+* **D, as in arXiv 2607.05291.** The daily volatility sigma_t = sqrt(RV_t) (5-minute RV, the target itself) of
+  days up to d-1; context 512 days for TTM (the r2.1 maximum, as in the paper) and 1,000 days for TimesFM-2.5
+  (padded/masked to 1,024 by its API) and Chronos-2 (the paper's context for its other models); horizon 1;
+  raw daily variance = max(sigma_hat, 0)^2.
+
+Point forecast = the model's mean: TTM's output (MSE-trained); TimesFM-2.5's mean channel (index 0 of its
+quantile output, not the median it returns as "point"); Chronos-2: the average of its 0.1..0.9 quantiles (the
+paper's rule for Chronos-Bolt and Moirai; Chronos-2's own "mean" is its median). Settings: TTM frequency token
+"h" (H) or "d" (D), and the context standard-scaled per window as its card asks; TimesFM-2.5 with the
+model-card ForecastConfig (normalize_inputs, continuous quantile head, flip invariance, infer_is_positive,
+fix_quantile_crossing), max_horizon 128, no torch.compile; Chronos-2 with its defaults (univariate, no
+cross-learning), float32. A raw forecast below 1e-10 is floored there (the data-build floor) and counted.
+
+**Calibration, as for Kronos:** one pooled scale c per model and specification, c = mean(RV / raw) on the
+validation period (2024-07-01 .. 2025-06-30, every day, 10 assets), frozen. Headline rows = c x raw; raw rows
+are also scored. The validation year is before every model's weights date, so it may be inside their training
+data; that can only affect c and the variant, not the test.
+
+### 13.3 The TTM + log-HAR average (the 2607.05291 claim)
+
+2607.05291 (v2, 2026-11-20): nine zero-shot TSFMs against eight econometric models on 50 VOLARE assets; only
+TTM (512-96-ft-r2.1, daily sqrt(RV), 512 days) beats log-HAR in average QLIKE, narrowly, at every horizon; the
+equal-weight average of the two "squares the average of the two volatility forecasts" and is in the 10% MCS for
+100% of the assets at h = 1. Pre-declared rows, one per specification:
+**Avg = ((sqrt(F_TTM) + sqrt(F_log-HAR)) / 2)^2**, with F_TTM the calibrated TTM forecast. Read-outs: TTM (D)
+against log-HAR (QLIKE, DM); the average against log-HAR and against TTM (DM); the average in the pooled 10% MCS
+and in the per-asset 10% MCS (count of assets out of 10).
+
+### 13.4 Scoring (one run)
+
+* For each new model, on its own window (13.1), every row is scored on the same asset-days: HAR, log-HAR,
+  LightGBM, Kronos-mini, Kronos-small, the student, every new model that is clean on the whole window (both
+  specifications, calibrated and raw) and the two averages.
+* Metrics: QLIKE (primary), MSE, MZ R^2; pooled DM (daily cross-sectional mean of the loss differential,
+  Newey-West lag 7) of each new row against each of HAR, log-HAR, LightGBM, Kronos-mini, Kronos-small and the
+  student, on QLIKE and MSE, and of each average against its TTM row; the same with 2025-10-10 removed when the
+  window contains it; per asset QLIKE and DM against HAR and log-HAR; MCS (T_max, block 7, 2,000 draws, 10%)
+  pooled and per asset over the calibrated rows of the window.
+* `python -m kvh.cli tsfm-test` scores once. It re-checks the SHA-256 of `frozen_config.json` and of the new
+  `frozen_tsfm.json`, refuses a second run without `--force`, and appends to `results/test_log.jsonl` with
+  `forced = true` and `added = "TSFM extension (PLAN.md section 13)"` (the original test already ran once).
+* **Reproduction check** in the same run: every existing model's test forecasts are recomputed from scratch on
+  the full window and compared with `results/forecasts_test.csv` and `results/performance_test.csv`
+  (`results/tsfm_reproduction.json`). The original result files are not rewritten.
+
+### 13.5 Environment
+
+granite-tsfm (TTM) pins `torch<2.12`; the project is locked at torch 2.15.0+cpu. To keep the environment of
+the existing results, `[tool.uv] override-dependencies` lifts that upper bound instead of downgrading torch;
+TTM outputs are checked against a separate torch 2.11 environment on the same inputs. Weights live in the HF
+cache under the home directory (`~/.cache/quant-research/p3/hf`), never in the repo. 2 threads, one heavy
+process at a time.
+
