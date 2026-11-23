@@ -1,0 +1,1 @@
+{"torch": "2.11.0+cpu", "H_cc": {"n": 2880, "max_rel_diff": 2.5283460392226333e-07, "median_rel_diff": 2.6514710839481255e-08}, "H_park": {"n": 2880, "max_rel_diff": 2.211549484492087e-07, "median_rel_diff": 2.079071117212315e-08}, "D_sigma": {"n": 120, "max_rel_diff": 1.8035485693203825e-07, "median_rel_diff": 2.2625329209569128e-08}}

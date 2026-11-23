@@ -1,0 +1,10 @@
+{
+ "repo": "google/timesfm-2.5-200m-pytorch",
+ "original_revision": "a6e2c7cdf5f478e552410974e26d6ffc9afc08a6",
+ "refreshed_revision": "d418f3e8a8fa79d655b391c158f0ee8d68fe68c9",
+ "tensors_original": 272,
+ "tensors_refreshed": 232,
+ "same_names_after_fusing": true,
+ "tensors_bit_identical": 232,
+ "max_abs_diff": 0.0
+}

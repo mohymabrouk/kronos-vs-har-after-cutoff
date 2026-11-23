@@ -1,0 +1,113 @@
+{
+ "average": "((sqrt(F_TTM) + sqrt(F_log-HAR)) / 2)^2, F_TTM calibrated",
+ "crash_day": "2025-10-10",
+ "embargo_months": 1,
+ "floor": 1e-10,
+ "models": {
+  "chronos2": {
+   "D": {
+    "scale": 1.2355905844828396,
+    "val_forecasts": 3650,
+    "val_qlike_cal": 0.24178617975962372,
+    "variant": "sigma"
+   },
+   "H": {
+    "scale": 1.7031479884713214,
+    "val_forecasts": 3650,
+    "val_qlike_cal": 0.2397004805320052,
+    "variant": "park"
+   },
+   "branch": "main",
+   "context_d": 1000,
+   "context_h": 488,
+   "data_note": "no date stated; subsets of Chronos datasets and GIFT-Eval Pretrain, synthetic",
+   "effective_cutoff": "2025-10-30",
+   "label": "Chronos-2",
+   "repo": "amazon/chronos-2",
+   "revision": "95a9710e2596287d08352589f42634fa5abdf0a7",
+   "scoring_start": "2025-11-30",
+   "stated_data_end": null,
+   "weights_date": "2025-10-30",
+   "weights_sha256": "ddcda3c7508bf2528087723e98a20707cc04b7f370ae275a9fd88078ddba4f42"
+  },
+  "timesfm": {
+   "D": {
+    "scale": 1.2374677961366958,
+    "val_forecasts": 3650,
+    "val_qlike_cal": 0.2311259389558096,
+    "variant": "sigma"
+   },
+   "H": {
+    "scale": 1.6422563135074932,
+    "val_forecasts": 3650,
+    "val_qlike_cal": 0.22903035141257524,
+    "variant": "park"
+   },
+   "branch": "main",
+   "context_d": 1000,
+   "context_h": 488,
+   "data_note": "Wikimedia pageviews to Nov 2023, Google Trends to end-2022, GiftEvalPretrain, synthetic",
+   "effective_cutoff": "2025-09-02",
+   "label": "TimesFM-2.5",
+   "repo": "google/timesfm-2.5-200m-pytorch",
+   "revision": "d418f3e8a8fa79d655b391c158f0ee8d68fe68c9",
+   "scoring_start": "2025-10-02",
+   "stated_data_end": "2023-11-30",
+   "weights_date": "2025-09-02",
+   "weights_sha256": "2f776efe6245e42b24bc4153ffdf61810140210e4bd3b01fb21f7aa779ab6ce8"
+  },
+  "ttm": {
+   "D": {
+    "scale": 1.0969235551486336,
+    "val_forecasts": 3650,
+    "val_qlike_cal": 0.24376851103400893,
+    "variant": "sigma"
+   },
+   "H": {
+    "scale": 1.4003939514503763,
+    "val_forecasts": 3650,
+    "val_qlike_cal": 0.2454187606415579,
+    "variant": "park"
+   },
+   "branch": "512-96-ft-r2.1",
+   "context_d": 512,
+   "context_h": 512,
+   "data_note": "no date stated; fixed public datasets (Monash/Zenodo, LOTSA subsets), incl. a Bitcoin set ending 2021",
+   "effective_cutoff": "2025-01-31",
+   "label": "TTM-r2.1",
+   "repo": "ibm-granite/granite-timeseries-ttm-r2",
+   "revision": "a23813d5e5859987e522d084f7d1d1ef9f134c3e",
+   "scoring_start": "2025-08-01",
+   "stated_data_end": null,
+   "weights_date": "2025-01-31",
+   "weights_sha256": "37fa184887f260cda022d3ae9f1c642fdba579d0aefeabdf751f83f45383a761"
+  }
+ },
+ "original_frozen_config_sha256": "aba34451afb79a02c00eb30666af95523f4e942fea61ff9cf232962c0b8c608b",
+ "plan": "PLAN.md section 13",
+ "point_forecast": {
+  "chronos2": "mean of the 0.1..0.9 quantiles",
+  "timesfm": "mean channel (index 0)",
+  "ttm": "model output (MSE-trained)"
+ },
+ "references": [
+  "HAR",
+  "log-HAR",
+  "LightGBM",
+  "Kronos-mini",
+  "Kronos-small",
+  "Student"
+ ],
+ "specs": [
+  "H",
+  "D"
+ ],
+ "versions": {
+  "chronos-forecasting": "2.3.2",
+  "granite-tsfm": "0.3.12",
+  "numpy": "2.5.5",
+  "timesfm": "3.0.2",
+  "torch": "2.15.0+cpu",
+  "transformers": "5.24.0"
+ }
+}
