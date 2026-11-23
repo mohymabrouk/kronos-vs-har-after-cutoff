@@ -39,6 +39,66 @@ weights: Aug 2025 to Oct 2026, 10 USDT pairs, {{N_TEST}} asset-days per model.
   improves on, whatever Kronos knows about tomorrow's variance, but what Kronos knows is not an edge over the
   2009 benchmark.
 
+**Extension (added 2026-11-23): three newer, general time-series foundation models do better than Kronos.
+Fed the daily realised-variance series, TTM and TimesFM-2.5 beat log-HAR at the 5% level after their release
+dates, but not after correcting for the {{HOLM_N}} tests run. Fed the hourly candles Kronos sees, none of the three beats
+log-HAR significantly.** Each model is scored only from one
+month after its weights were published. The settings were declared in PLAN.md section 13 before any forecast,
+and the test was scored once. Details are in the section "Newer foundation models".
+
+* **Daily RV input (the setup of arXiv 2607.05291).**
+  * TTM ({{TSFM_PARAMS_TTM}} parameters), on the whole test: QLIKE {{TQ_TTM_TTM_R2_1_DAILY_RV}} against
+    log-HAR's {{TQ_TTM_LOG_HAR}} (DM {{TDM_TTM_TTM_R2_1_DAILY_RV_VS_LOG_HAR}}, p =
+    {{TDMP_TTM_TTM_R2_1_DAILY_RV_VS_LOG_HAR}}). It ties LightGBM (DM {{TDM_TTM_TTM_R2_1_DAILY_RV_VS_LIGHTGBM}}).
+  * TimesFM-2.5, from {{TSFM_START_TIMESFM}}: {{TQ_TIMESFM_TIMESFM_2_5_DAILY_RV}} against log-HAR's
+    {{TQ_TIMESFM_LOG_HAR}} (DM {{TDM_TIMESFM_TIMESFM_2_5_DAILY_RV_VS_LOG_HAR}}, p =
+    {{TDMP_TIMESFM_TIMESFM_2_5_DAILY_RV_VS_LOG_HAR}}). It also beats LightGBM, the best model of the original
+    test ({{TQ_TIMESFM_LIGHTGBM}}, DM {{TDM_TIMESFM_TIMESFM_2_5_DAILY_RV_VS_LIGHTGBM}}).
+  * Chronos-2, from {{TSFM_START_CHRONOS2}}: {{TQ_CHRONOS2_CHRONOS_2_DAILY_RV}} against log-HAR's
+    {{TQ_CHRONOS2_LOG_HAR}}. The difference is not significant (DM {{TDM_CHRONOS2_CHRONOS_2_DAILY_RV_VS_LOG_HAR}},
+    p = {{TDMP_CHRONOS2_CHRONOS_2_DAILY_RV_VS_LOG_HAR}}).
+  * Without the 2025-10-10 crash day, TTM and TimesFM-2.5 still beat log-HAR (DM
+    {{TDMX_TTM_TTM_R2_1_DAILY_RV_VS_LOG_HAR}} and {{TDMX_TIMESFM_TIMESFM_2_5_DAILY_RV_VS_LOG_HAR}}).
+  * **Multiple testing.** These are {{HOLM_N}} pre-declared tests against log-HAR: 3 models x 2 inputs, each
+    on its own window. After a Holm correction for all {{HOLM_N}}, {{HOLM_N_SIG}} stay significant at 5%
+    (smallest adjusted p = {{HOLM_MIN_P}}). The 10% model confidence set drops log-HAR only in the TTM window
+    and keeps it in the TimesFM-2.5 and Chronos-2 windows. Read the daily-input wins as suggestive, not
+    established.
+* **Hourly input (Kronos-matched).** No model is significantly better than log-HAR on its own window: DM
+  {{TDM_TTM_TTM_R2_1_HOURLY_VS_LOG_HAR}} for TTM (p = {{TDMP_TTM_TTM_R2_1_HOURLY_VS_LOG_HAR}}),
+  {{TDM_TIMESFM_TIMESFM_2_5_HOURLY_VS_LOG_HAR}} for TimesFM-2.5 (p =
+  {{TDMP_TIMESFM_TIMESFM_2_5_HOURLY_VS_LOG_HAR}}) and {{TDM_CHRONOS2_CHRONOS_2_HOURLY_VS_LOG_HAR}} for
+  Chronos-2 (p = {{TDMP_CHRONOS2_CHRONOS_2_HOURLY_VS_LOG_HAR}}).
+  * TimesFM-2.5 (hourly) still has the lowest QLIKE of its window ({{TQ_TIMESFM_TIMESFM_2_5_HOURLY}}).
+    Without the crash day, its daily-RV version is lower ({{TQX_TIMESFM_TIMESFM_2_5_DAILY_RV}} against
+    {{TQX_TIMESFM_TIMESFM_2_5_HOURLY}}).
+* **Against Kronos, the student and HAR.** Every new model, with either input and in every window, has a
+  lower QLIKE than Kronos-mini, Kronos-small and the student.
+  * Against those three, {{TSFM_KRONOS_SIG}} DM tests are significant at 5%. The others are all in the
+    TimesFM-2.5 window, which includes the crash day.
+  * Against HAR, {{TSFM_HAR_SIG}} are significant.
+* **The 2607.05291 claim, on crypto with no training-data overlap.**
+  * In the paper, only TTM had a lower average QLIKE than log-HAR, by a narrow margin. Here TTM beats log-HAR
+    by more: a QLIKE ratio of {{TR_TTM_TTM_R2_1_DAILY_RV}}, against {{TSFM_PAPER_TTM_RATIO}} there.
+    TimesFM-2.5 beats it too.
+  * The equal-weight TTM + log-HAR average also beats log-HAR (ratio {{TR_TTM_AVG_TTM_R2_1_DAILY_RV_LOG_HAR}},
+    DM {{TDM_TTM_AVG_TTM_R2_1_DAILY_RV_LOG_HAR_VS_LOG_HAR}}). But it does not improve on TTM alone (DM
+    {{TDM_TTM_AVG_TTM_R2_1_DAILY_RV_LOG_HAR_VS_TTM_R2_1_DAILY_RV}}, p =
+    {{TDMP_TTM_AVG_TTM_R2_1_DAILY_RV_LOG_HAR_VS_TTM_R2_1_DAILY_RV}}). In the paper its ratio was below TTM's
+    ({{TSFM_PAPER_AVG_RATIO}} against {{TSFM_PAPER_TTM_RATIO}}).
+  * The average is in the per-asset 10% MCS for {{TSFM_AVG_ASSETS_MCS_D}} of 10 assets (paper:
+    {{TSFM_PAPER_AVG_MCS}}% of 50). TTM is in it for {{TSFM_TTM_ASSETS_MCS_D}} and log-HAR for
+    {{TSFM_LOGHAR_ASSETS_MCS}}.
+* **Caveats.**
+  * These are single pairwise tests on 10 correlated assets. The pooled 10% MCS still keeps LightGBM in every
+    window, and log-HAR in the two later ones.
+  * On MSE, {{TSFM_MSE_SIG}} DM tests of the new models against log-HAR are significant at 5%: a few extreme
+    days dominate MSE.
+  * The windows of TimesFM-2.5 and Chronos-2 are shorter ({{TSFM_DAYS_TIMESFM}} and {{TSFM_DAYS_CHRONOS2}}
+    days).
+* **Reproduction.** Recomputing every original model in the new environment gives identical forecasts and
+  scores (`results/tsfm_reproduction.json`).
+
 ## Question
 
 Kronos (Shi et al., "Kronos: A Foundation Model for the Language of Financial Markets", arXiv 2508.02739,
@@ -49,6 +109,11 @@ two questions on data Kronos could not have seen:
 1. Does a Kronos variance forecast beat the HAR-RV model of Corsi (2009) at next-day realised variance?
 2. Can a student network under 100k parameters, distilled from Kronos-small on pre-test data only, keep
    Kronos's edge at a fraction of the cost?
+
+An extension added after the original test asks a third question. Do three newer general time-series
+foundation models (TTM, TimesFM-2.5, Chronos-2) do better? Each is scored only on days after its own
+release. And does the TTM + log-HAR average that arXiv 2607.05291 found best on 50 VOLARE assets hold up on
+crypto, with no overlap with the training data?
 
 ## Design in one screen
 
@@ -157,6 +222,113 @@ scored on those same asset-days.
 
 The cost-against-accuracy figure is under the headline.
 
+## Newer foundation models, each scored only after its release
+
+This section was added after the original test (PLAN.md section 13). Its settings were declared there before
+any forecast of these models was made. Three zero-shot time-series foundation models, all newer than Kronos,
+are scored only on test days after their weights were published, plus the same one-month embargo as Kronos.
+Within each table, every row is scored on the same asset-days.
+
+{{TSFM_PINS}}
+
+* **Pinned weights.** Each model is pinned to the HuggingFace commit that uploaded the weight file used, and a
+  test checks that file's SHA-256.
+  * TTM is the `512-96-ft-r2.1` checkpoint of the r2 repo, the one 2607.05291 uses.
+  * TimesFM-2.5's 2025-10-01 file is a re-export with fused query/key/value matrices. Once its query, key and
+    value are concatenated, the 2025-09-02 upload equals it ({{TSFM_TIMESFM_WEIGHTS}},
+    `scripts/timesfm_weights_check.py`), so the weights date is 2025-09-02.
+  * Chronos-2 is pinned to its original 2025-10-30 commit. Its weight and config files have the same object
+    ids on main (2026-06-05); the later commits edit the README.
+* **Scoring start** = the later of the weights date and the latest dated training source on the model card,
+  plus one calendar month: the Kronos rule (2025-07-01 + one month = 2025-08-01). The 2025-10-10 crash is in
+  the TTM and TimesFM-2.5 windows, not in Chronos-2's.
+* **Two input specifications**, both declared in advance and both reported.
+  * **H (hourly), Kronos-matched, the primary one.** The hourly candles Kronos sees at 00:00 UTC: 488 of them
+    (TTM: 512, its fixed context). The models are univariate, so the candles become an hourly volatility
+    series: the absolute hourly log return (`cc`), or the square root of the hourly Parkinson variance
+    (`park`), chosen on validation. The model forecasts the next 24 hours; the variance forecast is the sum of
+    the squared hourly forecasts.
+  * **D (daily RV), as in 2607.05291.** The daily volatility sqrt(RV) of the previous days: 512 days for TTM,
+    1,000 for TimesFM-2.5 and Chronos-2. The variance forecast is the squared one-day forecast.
+* **Point forecast** = the model's mean: TTM's output, TimesFM-2.5's mean head, and for Chronos-2 the average
+  of its 0.1 to 0.9 quantiles (2607.05291's rule for quantile models).
+* **Calibration, as for Kronos.** One scale c per model and input, c = mean(RV / raw), fitted on the
+  validation year and frozen. Headline rows are calibrated; raw rows are in the last table of this section.
+* **The TTM + log-HAR average**, as in 2607.05291: ((sqrt(F_TTM) + sqrt(F_log-HAR)) / 2)^2, with the
+  calibrated TTM forecast.
+
+Validation (2024-07-01 to 2025-06-30, every day, 10 assets). On the same asset-days HAR scores
+{{TSFM_VAL_HAR}} and log-HAR {{TSFM_VAL_LOGHAR}}. This year is before every weights date, so it may be inside
+the models' training data; that can affect c and the series choice, not the test.
+
+{{TSFM_VAL}}
+
+How to read the window tables:
+
+* A DM cell is the statistic with its p-value. It is the pooled test of the main table: the daily
+  cross-sectional mean of the QLIKE differential, Newey-West lag 7.
+* Negative means the row's model is better than the column's model.
+* "DM vs its TTM row" compares each average with its own TTM forecast.
+
+### TTM window: {{TSFM_START_TTM}} to 2026-10-31 ({{TSFM_DAYS_TTM}} days, {{TSFM_N_TTM}} asset-days)
+
+{{TSFM_WIN_TTM}}
+
+### TimesFM-2.5 window: {{TSFM_START_TIMESFM}} to 2026-10-31 ({{TSFM_DAYS_TIMESFM}} days, {{TSFM_N_TIMESFM}} asset-days)
+
+{{TSFM_WIN_TIMESFM}}
+
+### Chronos-2 window: {{TSFM_START_CHRONOS2}} to 2026-10-31 ({{TSFM_DAYS_CHRONOS2}} days, {{TSFM_N_CHRONOS2}} asset-days)
+
+{{TSFM_WIN_CHRONOS2}}
+
+### Without the 2025-10-10 crash day
+
+This covers the two windows that contain the crash, and it is part of the declared scoring.
+
+{{TSFM_CRASH}}
+
+### Model confidence set (10%), pooled and per asset
+
+The set is computed over the calibrated rows of each window: T_max statistic, 7-day blocks, 2,000 draws.
+"Assets in MCS" counts the per-asset sets that contain the model.
+
+{{TSFM_MCS}}
+
+### The 2607.05291 claim on crypto (TTM window)
+
+{{TSFM_CLAIM}}
+
+### Per asset (QLIKE; the lowest per asset in bold)
+
+TTM window:
+
+{{TSFM_PA_TTM}}
+
+TimesFM-2.5 window:
+
+{{TSFM_PA_TIMESFM}}
+
+Chronos-2 window:
+
+{{TSFM_PA_CHRONOS2}}
+
+### Raw against calibrated, and compute
+
+{{TSFM_RAW}}
+
+{{TSFM_COST}}
+
+Total CPU time of the new models on the test period: {{TSFM_CPU_H}} CPU-hours, on 2 threads. The costs
+were measured during the run, while other jobs shared the machine, so they are higher than in the
+throughput check before the run (PLAN.md 13.6).
+
+* **Reproduction check.** In the same run, every existing model's test forecasts were recomputed from scratch
+  in the new environment: {{TSFM_REPRO}}.
+* **Environment.** granite-tsfm declares `torch<2.12`; the project keeps torch 2.15 through a uv override, so
+  the original environment is unchanged. The TTM forecasts were repeated under torch 2.11 in a separate
+  environment: {{TSFM_TORCH}}.
+
 ## Compute
 
 Kronos on the test period, measured during the run:
@@ -220,6 +392,11 @@ Test log (`results/test_log.jsonl`):
   the original, makes 16-path, 24-step forecasts cost about a second on 2 threads.
 * **A distilled student of a few thousand parameters.** It is trained only on pre-test teacher outputs and
   scored like every other model.
+* **Three newer foundation models, each scored only after its release.**
+  * Weights are pinned to HuggingFace commits and checked by SHA-256. A tested rule sets each model's scoring
+    start. TimesFM-2.5's re-exported weights were shown to equal the original upload.
+  * This is a direct test of the TTM + log-HAR claim of 2607.05291, on an asset class and period that no
+    model could have seen.
 
 ## Limits
 
@@ -239,6 +416,12 @@ Test log (`results/test_log.jsonl`):
 * **Kronos-base was run only on a small subset**, so its row has wide confidence bands.
 * **The student's feature extraction is pandas-bound** (milliseconds). Its network forward pass is tens of
   microseconds.
+* **The newer foundation models get one series each.** Here they see a single series derived from the
+  candles, not the candles themselves. TTM and Chronos-2 can take several channels and covariates; that was
+  not tried.
+* **The newer models have shorter windows.** TimesFM-2.5 is scored on {{TSFM_DAYS_TIMESFM}} days and Chronos-2
+  on {{TSFM_DAYS_CHRONOS2}}, so their tests have less power than TTM's. Chronos-2's window contains no crash
+  like 2025-10-10.
 
 ## Simplifications and deviations
 
@@ -283,6 +466,22 @@ Test log (`results/test_log.jsonl`):
 * **Data repairs.** Hourly gaps (31 hours in 6.8 years) are filled flat at the last close with zero volume.
   The 7 days with fewer than 260 of 288 five-minute bars are kept and flagged.
 
+**Newer foundation models (PLAN.md section 13)**
+* **Departures from 2607.05291.**
+  * The data are crypto, which trades 24/7, so days are calendar days. There are 10 assets and one horizon (1
+    day).
+  * A validation scale c is applied on top of the raw forecast; the raw rows are reported too.
+  * Forecasts are not winsorised to their past range.
+  * The model confidence set covers the 6 reference models plus the new rows, not the paper's 17 models.
+  * Chronos-2 is not in that paper. It gets the 1,000-day context the paper gives its other models.
+* **TTM checkpoint.** We use the `512-96-ft-r2.1` branch (frequency-tuned, r2.1 release), not the repo's main
+  branch (512-96-r2), because it is the checkpoint of 2607.05291 and it takes hourly and daily data. Its context
+  is fixed at 512 steps, so with hourly input it sees 24 more candles than Kronos.
+* **TimesFM-2.5's mean head** is the point forecast, not the median the library returns as its "point"
+  output.
+* **Only the validation-chosen hourly series was generated on test.** Test forecasts of each model start at
+  its scoring start; nothing earlier was generated.
+
 **Order of runs.** The Kronos test-period forecasts were generated (with the frozen Kronos settings) before
 the student was fitted and the full config frozen. The student reads no test-period file, and all scoring
 happened once, after `freeze`. See PLAN.md, "Changes during the build".
@@ -309,11 +508,46 @@ uv run python -m kvh.cli kronos --period test --models mini      # frozen settin
 uv run python -m kvh.cli kronos --period test --models small
 uv run python -m kvh.cli kronos --period test --models base --symbols BTCUSDT,ETHUSDT --stride 4
 uv run python -m kvh.cli test              # scores once; a rerun needs --force and is logged
+# newer foundation models (PLAN.md section 13), each scored only after its release
+uv run python -m kvh.cli tsfm --period val           # TTM, TimesFM-2.5, Chronos-2: every validation day, both inputs
+uv run python -m kvh.cli tsfm-validate               # scale c and hourly series -> results/frozen_tsfm.json + sha256
+uv run python -m kvh.cli tsfm --period test          # frozen settings, from each model's scoring start
+uv run python -m kvh.cli tsfm-test                   # scores once (an added, forced run in the test log) + reproduction check
 uv run python -m kvh.cli report            # tables.md, figures, this README
-uv run pytest                              # 6 groups of tests
+uv run pytest                              # 9 groups of tests (the TSFM weight tests skip without local weights)
 ```
 
 The Kronos jobs write one parquet file per (model, setting, asset, month) under
-`~/.cache/quant-research/p3/kronos/`, so an interrupted run resumes where it stopped. The model code
-is vendored in `third_party/kronos/` (MIT licence, commit 67b630e). The weights are pinned to their
-HuggingFace revisions in `src/kvh/config.py`.
+`~/.cache/quant-research/p3/kronos/`, so an interrupted run resumes where it stopped; the TSFM jobs do the
+same under `~/.cache/quant-research/p3/tsfm/`. The model code is vendored in `third_party/kronos/` (MIT
+licence, commit 67b630e). All weights are pinned to HuggingFace commits in `src/kvh/config.py` and downloaded
+to `~/.cache/quant-research/p3/hf/`, outside the repo. `scripts/ttm_torch_check.py` repeats the TTM forecasts
+under torch 2.11 (the range granite-tsfm declares) in a separate environment.
+
+## Related work (2026)
+
+* **Brini, "Forecasting Realized Volatility with Time Series Foundation Models: A Comparison with Econometric
+  Benchmarks", [arXiv 2607.05291](https://arxiv.org/abs/2607.05291)** (July 2026, revised November 2026).
+  * Setup: nine zero-shot foundation models against eight econometric models, on realised volatility of 50
+    VOLARE assets (equities, currencies, futures), 1, 5 and 22 days ahead.
+  * Findings: the foundation models do not beat the econometric models as a class. Only TTM, the smallest,
+    beats log-HAR in average QLIKE, narrowly, at every horizon. The equal-weight TTM + log-HAR average matches
+    the best single model and is in the model confidence set for nearly every asset.
+  * The section "Newer foundation models" above tests that claim on crypto, after TTM's weights date.
+* **Upadhyay, "Do Time-Series Foundation Models Forecast Index-Futures Returns? A Preregistered Evaluation of
+  Models, Metrics, and Input Representations", [arXiv 2611.12141](https://arxiv.org/abs/2611.12141)**
+  (November 2026). On E-mini Nasdaq-100 and S&P 500 futures, 5 to 120 minutes ahead, 0 of 160
+  model-representation-horizon-market cells beat a no-change forecast on a blind set opened once. Kronos is
+  evaluated in separate experiments.
+* **Bulut, "Conflicting History in Foundation Model Return Forecasts",
+  [arXiv 2610.25822](https://arxiv.org/abs/2610.25822)** (October 2026). Older observations can teach a
+  foundation model a predictive relationship but mislead it once the relationship changes. In simulations
+  this "conflicting history" lowers the chance of beating a zero forecast; on 56 assets, neither 256 nor 64
+  returns of context beat zero.
+* **Noguer i Alonso and Pereira Franklin, "Pretrained Time-Series Foundation Models for Financial Return
+  Forecasting", [arXiv 2606.27100](https://arxiv.org/abs/2606.27100)** (June 2026). TimeGPT,
+  TimesFM-2.5, Moirai-2.0, Chronos and Chronos-2 against neural models trained from scratch, on five US
+  stocks. Pretrained models win most rankings, but their gains over a random walk are small and sparse.
+* **Shi et al., "Kronos: A Foundation Model for the Language of Financial Markets",
+  [arXiv 2508.02739](https://arxiv.org/abs/2508.02739)** (August 2025, AAAI 2026). The model of the
+  original study.

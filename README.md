@@ -39,6 +39,66 @@ weights: Aug 2025 to Oct 2026, 10 USDT pairs, 4,570 asset-days per model.
   improves on, whatever Kronos knows about tomorrow's variance, but what Kronos knows is not an edge over the
   2009 benchmark.
 
+**Extension (added 2026-11-23): three newer, general time-series foundation models do better than Kronos.
+Fed the daily realised-variance series, TTM and TimesFM-2.5 beat log-HAR at the 5% level after their release
+dates, but not after correcting for the 6 tests run. Fed the hourly candles Kronos sees, none of the three beats
+log-HAR significantly.** Each model is scored only from one
+month after its weights were published. The settings were declared in PLAN.md section 13 before any forecast,
+and the test was scored once. Details are in the section "Newer foundation models".
+
+* **Daily RV input (the setup of arXiv 2607.05291).**
+  * TTM (0.86M parameters), on the whole test: QLIKE 0.462 against
+    log-HAR's 0.482 (DM -2.12, p =
+    0.034). It ties LightGBM (DM -0.01).
+  * TimesFM-2.5, from 2025-10-02: 0.469 against log-HAR's
+    0.525 (DM -2.36, p =
+    0.018). It also beats LightGBM, the best model of the original
+    test (0.503, DM -4.29).
+  * Chronos-2, from 2025-11-30: 0.192 against log-HAR's
+    0.211. The difference is not significant (DM -1.87,
+    p = 0.062).
+  * Without the 2025-10-10 crash day, TTM and TimesFM-2.5 still beat log-HAR (DM
+    -2.29 and -4.60).
+  * **Multiple testing.** These are 6 pre-declared tests against log-HAR: 3 models x 2 inputs, each
+    on its own window. After a Holm correction for all 6, none stay significant at 5%
+    (smallest adjusted p = 0.11). The 10% model confidence set drops log-HAR only in the TTM window
+    and keeps it in the TimesFM-2.5 and Chronos-2 windows. Read the daily-input wins as suggestive, not
+    established.
+* **Hourly input (Kronos-matched).** No model is significantly better than log-HAR on its own window: DM
+  +0.31 for TTM (p = 0.756),
+  -1.26 for TimesFM-2.5 (p =
+  0.208) and +0.07 for
+  Chronos-2 (p = 0.946).
+  * TimesFM-2.5 (hourly) still has the lowest QLIKE of its window (0.448).
+    Without the crash day, its daily-RV version is lower (0.176 against
+    0.193).
+* **Against Kronos, the student and HAR.** Every new model, with either input and in every window, has a
+  lower QLIKE than Kronos-mini, Kronos-small and the student.
+  * Against those three, 33 of 36 DM tests are significant at 5%. The others are all in the
+    TimesFM-2.5 window, which includes the crash day.
+  * Against HAR, 12 of 12 are significant.
+* **The 2607.05291 claim, on crypto with no training-data overlap.**
+  * In the paper, only TTM had a lower average QLIKE than log-HAR, by a narrow margin. Here TTM beats log-HAR
+    by more: a QLIKE ratio of 0.960, against 0.984 there.
+    TimesFM-2.5 beats it too.
+  * The equal-weight TTM + log-HAR average also beats log-HAR (ratio 0.969,
+    DM -2.87). But it does not improve on TTM alone (DM
+    +1.12, p =
+    0.261). In the paper its ratio was below TTM's
+    (0.978 against 0.984).
+  * The average is in the per-asset 10% MCS for 9 of 10 assets (paper:
+    100% of 50). TTM is in it for 10 and log-HAR for
+    7.
+* **Caveats.**
+  * These are single pairwise tests on 10 correlated assets. The pooled 10% MCS still keeps LightGBM in every
+    window, and log-HAR in the two later ones.
+  * On MSE, 0 of 12 DM tests of the new models against log-HAR are significant at 5%: a few extreme
+    days dominate MSE.
+  * The windows of TimesFM-2.5 and Chronos-2 are shorter (395 and 336
+    days).
+* **Reproduction.** Recomputing every original model in the new environment gives identical forecasts and
+  scores (`results/tsfm_reproduction.json`).
+
 ## Question
 
 Kronos (Shi et al., "Kronos: A Foundation Model for the Language of Financial Markets", arXiv 2508.02739,
@@ -49,6 +109,11 @@ two questions on data Kronos could not have seen:
 1. Does a Kronos variance forecast beat the HAR-RV model of Corsi (2009) at next-day realised variance?
 2. Can a student network under 100k parameters, distilled from Kronos-small on pre-test data only, keep
    Kronos's edge at a fraction of the cost?
+
+An extension added after the original test asks a third question. Do three newer general time-series
+foundation models (TTM, TimesFM-2.5, Chronos-2) do better? Each is scored only on days after its own
+release. And does the TTM + log-HAR average that arXiv 2607.05291 found best on 50 VOLARE assets hold up on
+crypto, with no overlap with the training data?
 
 ## Design in one screen
 
@@ -233,6 +298,268 @@ scored on those same asset-days.
 
 The cost-against-accuracy figure is under the headline.
 
+## Newer foundation models, each scored only after its release
+
+This section was added after the original test (PLAN.md section 13). Its settings were declared there before
+any forecast of these models was made. Three zero-shot time-series foundation models, all newer than Kronos,
+are scored only on test days after their weights were published, plus the same one-month embargo as Kronos.
+Within each table, every row is scored on the same asset-days.
+
+| Model | Parameters | Weights (HF repo, branch @ pinned commit) | Weights date | Training data on the model card | Scored from | Test days |
+|---|---|---|---|---|---|---|
+| TTM-r2.1 | 855,100 | `ibm-granite/granite-timeseries-ttm-r2`, `512-96-ft-r2.1` @ `a23813d5` | 2025-01-31 | no date stated; fixed public datasets (Monash/Zenodo, LOTSA subsets), incl. a Bitcoin set ending 2021 | 2025-08-01 | 457 |
+| TimesFM-2.5 | 231,289,280 | `google/timesfm-2.5-200m-pytorch`, `main` @ `d418f3e8` | 2025-09-02 | Wikimedia pageviews to Nov 2023, Google Trends to end-2022, GiftEvalPretrain, synthetic | 2025-10-02 | 395 |
+| Chronos-2 | 119,477,664 | `amazon/chronos-2`, `main` @ `95a9710e` | 2025-10-30 | no date stated; subsets of Chronos datasets and GIFT-Eval Pretrain, synthetic | 2025-11-30 | 336 |
+
+* **Pinned weights.** Each model is pinned to the HuggingFace commit that uploaded the weight file used, and a
+  test checks that file's SHA-256.
+  * TTM is the `512-96-ft-r2.1` checkpoint of the r2 repo, the one 2607.05291 uses.
+  * TimesFM-2.5's 2025-10-01 file is a re-export with fused query/key/value matrices. Once its query, key and
+    value are concatenated, the 2025-09-02 upload equals it (232 of 232 tensors bit-identical,
+    `scripts/timesfm_weights_check.py`), so the weights date is 2025-09-02.
+  * Chronos-2 is pinned to its original 2025-10-30 commit. Its weight and config files have the same object
+    ids on main (2026-06-05); the later commits edit the README.
+* **Scoring start** = the later of the weights date and the latest dated training source on the model card,
+  plus one calendar month: the Kronos rule (2025-07-01 + one month = 2025-08-01). The 2025-10-10 crash is in
+  the TTM and TimesFM-2.5 windows, not in Chronos-2's.
+* **Two input specifications**, both declared in advance and both reported.
+  * **H (hourly), Kronos-matched, the primary one.** The hourly candles Kronos sees at 00:00 UTC: 488 of them
+    (TTM: 512, its fixed context). The models are univariate, so the candles become an hourly volatility
+    series: the absolute hourly log return (`cc`), or the square root of the hourly Parkinson variance
+    (`park`), chosen on validation. The model forecasts the next 24 hours; the variance forecast is the sum of
+    the squared hourly forecasts.
+  * **D (daily RV), as in 2607.05291.** The daily volatility sqrt(RV) of the previous days: 512 days for TTM,
+    1,000 for TimesFM-2.5 and Chronos-2. The variance forecast is the squared one-day forecast.
+* **Point forecast** = the model's mean: TTM's output, TimesFM-2.5's mean head, and for Chronos-2 the average
+  of its 0.1 to 0.9 quantiles (2607.05291's rule for quantile models).
+* **Calibration, as for Kronos.** One scale c per model and input, c = mean(RV / raw), fitted on the
+  validation year and frozen. Headline rows are calibrated; raw rows are in the last table of this section.
+* **The TTM + log-HAR average**, as in 2607.05291: ((sqrt(F_TTM) + sqrt(F_log-HAR)) / 2)^2, with the
+  calibrated TTM forecast.
+
+Validation (2024-07-01 to 2025-06-30, every day, 10 assets). On the same asset-days HAR scores
+0.3059 and log-HAR 0.2603. This year is before every weights date, so it may be inside
+the models' training data; that can affect c and the series choice, not the test.
+
+| Model | Input | Series | Forecasts | Scale c | QLIKE raw | QLIKE calibrated | Chosen |
+|---|---|---|---|---|---|---|---|
+| TTM-r2.1 | hourly (H) | cc | 3650 | 2.104 | 0.6358 | 0.2755 |  |
+| TTM-r2.1 | hourly (H) | park | 3650 | 1.400 | 0.3091 | 0.2454 | yes |
+| TTM-r2.1 | daily RV (D) | sigma | 3650 | 1.097 | 0.2482 | 0.2438 | yes |
+| TimesFM-2.5 | hourly (H) | cc | 3650 | 2.782 | 1.0222 | 0.2635 |  |
+| TimesFM-2.5 | hourly (H) | park | 3650 | 1.642 | 0.3752 | 0.2290 | yes |
+| TimesFM-2.5 | daily RV (D) | sigma | 3650 | 1.237 | 0.2555 | 0.2311 | yes |
+| Chronos-2 | hourly (H) | cc | 3650 | 3.041 | 1.2263 | 0.2978 |  |
+| Chronos-2 | hourly (H) | park | 3650 | 1.703 | 0.4104 | 0.2397 | yes |
+| Chronos-2 | daily RV (D) | sigma | 3650 | 1.236 | 0.2658 | 0.2418 | yes |
+
+How to read the window tables:
+
+* A DM cell is the statistic with its p-value. It is the pooled test of the main table: the daily
+  cross-sectional mean of the QLIKE differential, Newey-West lag 7.
+* Negative means the row's model is better than the column's model.
+* "DM vs its TTM row" compares each average with its own TTM forecast.
+
+### TTM window: 2025-08-01 to 2026-10-31 (457 days, 4,570 asset-days)
+
+| Model | QLIKE | QLIKE / log-HAR | MSE | MZ R^2 | DM vs HAR | DM vs log-HAR | DM vs LightGBM | DM vs Kronos-mini | DM vs Kronos-small | DM vs Student | DM vs its TTM row | DM vs log-HAR (MSE) |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| HAR | 0.6199 | 1.287 | 17360.6 | 0.507 |  |  |  |  |  |  |  |  |
+| log-HAR | 0.4818 | 1.000 | 15865.0 | 0.656 |  |  |  |  |  |  |  |  |
+| LightGBM | 0.4625 | 0.960 | 15312.9 | 0.666 |  |  |  |  |  |  |  |  |
+| Kronos-mini | 0.6801 | 1.412 | 15132.4 | 0.538 |  |  |  |  |  |  |  |  |
+| Kronos-small | 0.6712 | 1.393 | 15793.7 | 0.508 |  |  |  |  |  |  |  |  |
+| Student | 0.5809 | 1.206 | 15069.6 | 0.642 |  |  |  |  |  |  |  |  |
+| TTM-r2.1 (hourly) | 0.4871 | 1.011 | 14989.8 | 0.694 | -3.19 (0.001) | +0.31 (0.756) | +0.72 (0.469) | -2.58 (0.010) | -3.49 (<0.001) | -2.47 (0.014) |  | -1.03 (0.304) |
+| TTM-r2.1 (daily RV) | 0.4624 | 0.960 | 15040.5 | 0.709 | -5.94 (<0.001) | -2.12 (0.034) | -0.01 (0.990) | -2.28 (0.023) | -2.89 (0.004) | -2.06 (0.040) |  | -1.02 (0.306) |
+| Avg: TTM-r2.1 (hourly) + log-HAR | 0.4778 | 0.992 | 15134.9 | 0.685 | -4.24 (<0.001) | -0.52 (0.601) | +0.61 (0.543) | -2.45 (0.014) | -3.25 (0.001) | -2.29 (0.022) | -0.99 (0.324) | -1.03 (0.304) |
+| Avg: TTM-r2.1 (daily RV) + log-HAR | 0.4670 | 0.969 | 15274.3 | 0.691 | -5.82 (<0.001) | -2.87 (0.004) | +0.31 (0.757) | -2.29 (0.022) | -2.93 (0.003) | -2.06 (0.039) | +1.12 (0.261) | -1.03 (0.305) |
+
+### TimesFM-2.5 window: 2025-10-02 to 2026-10-31 (395 days, 3,950 asset-days)
+
+| Model | QLIKE | QLIKE / log-HAR | MSE | MZ R^2 | DM vs HAR | DM vs log-HAR | DM vs LightGBM | DM vs Kronos-mini | DM vs Kronos-small | DM vs Student | DM vs its TTM row | DM vs log-HAR (MSE) |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| HAR | 0.6813 | 1.297 | 20066.4 | 0.501 |  |  |  |  |  |  |  |  |
+| log-HAR | 0.5252 | 1.000 | 18335.3 | 0.657 |  |  |  |  |  |  |  |  |
+| LightGBM | 0.5029 | 0.957 | 17696.6 | 0.667 |  |  |  |  |  |  |  |  |
+| Kronos-mini | 0.7487 | 1.426 | 17472.2 | 0.530 |  |  |  |  |  |  |  |  |
+| Kronos-small | 0.7338 | 1.397 | 18233.4 | 0.499 |  |  |  |  |  |  |  |  |
+| Student | 0.6346 | 1.208 | 17411.4 | 0.643 |  |  |  |  |  |  |  |  |
+| TTM-r2.1 (hourly) | 0.5349 | 1.018 | 17325.2 | 0.694 | -3.06 (0.002) | +0.49 (0.623) | +0.82 (0.414) | -2.48 (0.013) | -3.29 (0.001) | -2.28 (0.023) |  | -1.03 (0.304) |
+| TTM-r2.1 (daily RV) | 0.5070 | 0.965 | 17384.3 | 0.707 | -5.84 (<0.001) | -1.79 (0.073) | +0.26 (0.792) | -2.20 (0.028) | -2.73 (0.006) | -1.92 (0.055) |  | -1.02 (0.307) |
+| TimesFM-2.5 (hourly) | 0.4475 | 0.852 | 17280.7 | 0.722 | -4.19 (<0.001) | -1.26 (0.208) | -1.25 (0.210) | -1.87 (0.062) | -2.12 (0.034) | -1.58 (0.113) |  | -1.04 (0.300) |
+| TimesFM-2.5 (daily RV) | 0.4686 | 0.892 | 17386.2 | 0.748 | -8.32 (<0.001) | -2.36 (0.018) | -4.29 (<0.001) | -2.22 (0.026) | -2.70 (0.007) | -2.02 (0.043) |  | -1.03 (0.303) |
+| Avg: TTM-r2.1 (hourly) + log-HAR | 0.5230 | 0.996 | 17492.7 | 0.684 | -4.14 (<0.001) | -0.25 (0.804) | +0.70 (0.485) | -2.37 (0.018) | -3.09 (0.002) | -2.15 (0.031) | -1.09 (0.276) | -1.03 (0.305) |
+| Avg: TTM-r2.1 (daily RV) + log-HAR | 0.5110 | 0.973 | 17653.8 | 0.689 | -5.76 (<0.001) | -2.49 (0.013) | +0.49 (0.627) | -2.21 (0.027) | -2.78 (0.005) | -1.94 (0.052) | +0.88 (0.381) | -1.02 (0.305) |
+
+### Chronos-2 window: 2025-11-30 to 2026-10-31 (336 days, 3,360 asset-days)
+
+| Model | QLIKE | QLIKE / log-HAR | MSE | MZ R^2 | DM vs HAR | DM vs log-HAR | DM vs LightGBM | DM vs Kronos-mini | DM vs Kronos-small | DM vs Student | DM vs its TTM row | DM vs log-HAR (MSE) |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| HAR | 0.4001 | 1.896 | 184.4 | 0.526 |  |  |  |  |  |  |  |  |
+| log-HAR | 0.2110 | 1.000 | 82.5 | 0.682 |  |  |  |  |  |  |  |  |
+| LightGBM | 0.2098 | 0.994 | 92.4 | 0.689 |  |  |  |  |  |  |  |  |
+| Kronos-mini | 0.3484 | 1.651 | 237.1 | 0.534 |  |  |  |  |  |  |  |  |
+| Kronos-small | 0.3442 | 1.631 | 557.7 | 0.516 |  |  |  |  |  |  |  |  |
+| Student | 0.2696 | 1.277 | 116.1 | 0.660 |  |  |  |  |  |  |  |  |
+| TTM-r2.1 (hourly) | 0.2084 | 0.987 | 71.2 | 0.719 | -4.45 (<0.001) | -0.18 (0.860) | -0.06 (0.952) | -5.70 (<0.001) | -8.98 (<0.001) | -3.76 (<0.001) |  | -1.60 (0.109) |
+| TTM-r2.1 (daily RV) | 0.2056 | 0.974 | 84.4 | 0.729 | -5.87 (<0.001) | -0.91 (0.363) | -0.34 (0.735) | -4.12 (<0.001) | -7.61 (<0.001) | -3.07 (0.002) |  | +0.51 (0.612) |
+| TimesFM-2.5 (hourly) | 0.1987 | 0.941 | 70.5 | 0.744 | -5.45 (<0.001) | -1.13 (0.260) | -0.65 (0.513) | -4.55 (<0.001) | -8.26 (<0.001) | -3.52 (<0.001) |  | -1.48 (0.139) |
+| TimesFM-2.5 (daily RV) | 0.1819 | 0.862 | 78.3 | 0.775 | -7.90 (<0.001) | -3.70 (<0.001) | -3.54 (<0.001) | -3.98 (<0.001) | -6.90 (<0.001) | -3.17 (0.002) |  | -0.75 (0.455) |
+| Chronos-2 (hourly) | 0.2122 | 1.005 | 69.8 | 0.744 | -4.36 (<0.001) | +0.07 (0.946) | +0.10 (0.920) | -4.84 (<0.001) | -7.09 (<0.001) | -2.92 (0.003) |  | -0.90 (0.366) |
+| Chronos-2 (daily RV) | 0.1918 | 0.909 | 86.0 | 0.766 | -6.90 (<0.001) | -1.87 (0.062) | -1.61 (0.106) | -3.85 (<0.001) | -6.71 (<0.001) | -2.99 (0.003) |  | +0.42 (0.673) |
+| Avg: TTM-r2.1 (hourly) + log-HAR | 0.2029 | 0.962 | 74.1 | 0.709 | -5.53 (<0.001) | -1.27 (0.203) | -0.47 (0.638) | -4.59 (<0.001) | -8.44 (<0.001) | -3.48 (<0.001) | -0.62 (0.536) | -1.99 (0.047) |
+| Avg: TTM-r2.1 (daily RV) + log-HAR | 0.2042 | 0.968 | 81.9 | 0.713 | -6.21 (<0.001) | -2.66 (0.008) | -0.56 (0.577) | -3.99 (<0.001) | -7.30 (<0.001) | -2.97 (0.003) | -0.39 (0.696) | -0.32 (0.747) |
+
+### Without the 2025-10-10 crash day
+
+This covers the two windows that contain the crash, and it is part of the declared scoring.
+
+| Window | Model | QLIKE, all days | QLIKE, without 2025-10-10 | DM vs HAR | DM vs log-HAR | DM vs LightGBM | DM vs Kronos-mini | DM vs Kronos-small | DM vs Student |
+|---|---|---|---|---|---|---|---|---|---|
+| TTM-r2.1 | HAR | 0.6199 | 0.3612 |  |  |  |  |  |  |
+| TTM-r2.1 | log-HAR | 0.4818 | 0.2110 |  |  |  |  |  |  |
+| TTM-r2.1 | LightGBM | 0.4625 | 0.2078 |  |  |  |  |  |  |
+| TTM-r2.1 | Kronos-mini | 0.6801 | 0.3203 |  |  |  |  |  |  |
+| TTM-r2.1 | Kronos-small | 0.6712 | 0.3351 |  |  |  |  |  |  |
+| TTM-r2.1 | Student | 0.5809 | 0.2589 |  |  |  |  |  |  |
+| TTM-r2.1 | TTM-r2.1 (hourly) | 0.4871 | 0.2008 | -4.86 (<0.001) | -0.85 (0.396) | -0.40 (0.690) | -6.31 (<0.001) | -9.71 (<0.001) | -4.45 (<0.001) |
+| TTM-r2.1 | TTM-r2.1 (daily RV) | 0.4624 | 0.1964 | -6.37 (<0.001) | -2.29 (0.022) | -1.18 (0.238) | -4.75 (<0.001) | -8.78 (<0.001) | -3.76 (<0.001) |
+| TTM-r2.1 | Avg: TTM-r2.1 (hourly) + log-HAR | 0.4778 | 0.1996 | -5.81 (<0.001) | -2.19 (0.029) | -0.75 (0.453) | -4.99 (<0.001) | -9.21 (<0.001) | -3.97 (<0.001) |
+| TTM-r2.1 | Avg: TTM-r2.1 (daily RV) + log-HAR | 0.4670 | 0.1993 | -6.52 (<0.001) | -3.66 (<0.001) | -1.14 (0.255) | -4.44 (<0.001) | -8.34 (<0.001) | -3.48 (<0.001) |
+| TimesFM-2.5 | HAR | 0.6813 | 0.3820 |  |  |  |  |  |  |
+| TimesFM-2.5 | log-HAR | 0.5252 | 0.2119 |  |  |  |  |  |  |
+| TimesFM-2.5 | LightGBM | 0.5029 | 0.2082 |  |  |  |  |  |  |
+| TimesFM-2.5 | Kronos-mini | 0.7487 | 0.3325 |  |  |  |  |  |  |
+| TimesFM-2.5 | Kronos-small | 0.7338 | 0.3450 |  |  |  |  |  |  |
+| TimesFM-2.5 | Student | 0.6346 | 0.2621 |  |  |  |  |  |  |
+| TimesFM-2.5 | TTM-r2.1 (hourly) | 0.5349 | 0.2037 | -4.76 (<0.001) | -0.60 (0.546) | -0.22 (0.823) | -5.99 (<0.001) | -9.39 (<0.001) | -4.04 (<0.001) |
+| TimesFM-2.5 | TTM-r2.1 (daily RV) | 0.5070 | 0.1992 | -6.29 (<0.001) | -1.89 (0.058) | -0.82 (0.413) | -4.45 (<0.001) | -8.44 (<0.001) | -3.41 (<0.001) |
+| TimesFM-2.5 | TimesFM-2.5 (hourly) | 0.4475 | 0.1931 | -5.86 (<0.001) | -1.84 (0.065) | -1.02 (0.306) | -4.90 (<0.001) | -9.04 (<0.001) | -3.89 (<0.001) |
+| TimesFM-2.5 | TimesFM-2.5 (daily RV) | 0.4686 | 0.1763 | -8.40 (<0.001) | -4.60 (<0.001) | -4.38 (<0.001) | -4.35 (<0.001) | -7.77 (<0.001) | -3.57 (<0.001) |
+| TimesFM-2.5 | Avg: TTM-r2.1 (hourly) + log-HAR | 0.5230 | 0.2012 | -5.79 (<0.001) | -1.81 (0.071) | -0.55 (0.581) | -4.75 (<0.001) | -8.97 (<0.001) | -3.61 (<0.001) |
+| TimesFM-2.5 | Avg: TTM-r2.1 (daily RV) + log-HAR | 0.5110 | 0.2012 | -6.53 (<0.001) | -3.27 (0.001) | -0.81 (0.418) | -4.19 (<0.001) | -8.03 (<0.001) | -3.15 (0.002) |
+
+### Model confidence set (10%), pooled and per asset
+
+The set is computed over the calibrated rows of each window: T_max statistic, 7-day blocks, 2,000 draws.
+"Assets in MCS" counts the per-asset sets that contain the model.
+
+| Model | TTM-r2.1 window: pooled MCS p | TTM-r2.1 window: assets in MCS | TimesFM-2.5 window: pooled MCS p | TimesFM-2.5 window: assets in MCS | Chronos-2 window: pooled MCS p | Chronos-2 window: assets in MCS |
+|---|---|---|---|---|---|---|
+| HAR | 0.029 (out) | 4 / 10 | 0.021 (out) | 4 / 10 | 0.000 (out) | 2 / 10 |
+| log-HAR | 0.072 (out) | 7 / 10 | 0.144 (in) | 7 / 10 | 0.232 (in) | 9 / 10 |
+| LightGBM | 0.987 (in) | 7 / 10 | 0.339 (in) | 7 / 10 | 0.779 (in) | 7 / 10 |
+| Kronos-mini | 0.048 (out) | 5 / 10 | 0.059 (out) | 5 / 10 | 0.002 (out) | 1 / 10 |
+| Kronos-small | 0.022 (out) | 2 / 10 | 0.026 (out) | 4 / 10 | 0.000 (out) | 1 / 10 |
+| Student | 0.072 (out) | 7 / 10 | 0.144 (in) | 7 / 10 | 0.013 (out) | 6 / 10 |
+| TTM-r2.1 (hourly) | 0.510 (in) | 9 / 10 | 0.339 (in) | 8 / 10 | 0.779 (in) | 9 / 10 |
+| TTM-r2.1 (daily RV) | 1.000 (in) | 10 / 10 | 0.339 (in) | 10 / 10 | 0.779 (in) | 10 / 10 |
+| Avg: TTM-r2.1 (hourly) + log-HAR | 0.598 (in) | 8 / 10 | 0.339 (in) | 8 / 10 | 0.779 (in) | 9 / 10 |
+| Avg: TTM-r2.1 (daily RV) + log-HAR | 0.693 (in) | 9 / 10 | 0.308 (in) | 8 / 10 | 0.779 (in) | 9 / 10 |
+| TimesFM-2.5 (hourly) |  |  | 1.000 (in) | 10 / 10 | 0.779 (in) | 10 / 10 |
+| TimesFM-2.5 (daily RV) |  |  | 0.631 (in) | 10 / 10 | 1.000 (in) | 10 / 10 |
+| Chronos-2 (hourly) |  |  |  |  | 0.779 (in) | 10 / 10 |
+| Chronos-2 (daily RV) |  |  |  |  | 0.779 (in) | 10 / 10 |
+
+### The 2607.05291 claim on crypto (TTM window)
+
+|  | 2607.05291 (50 VOLARE assets, h = 1) | Here, daily RV input (D, as the paper) | Here, hourly input (H) |
+|---|---|---|---|
+| QLIKE of TTM / log-HAR | 0.984 | 0.960 | 1.011 |
+| DM, TTM vs log-HAR (QLIKE) | not reported | -2.12 (0.034) | +0.31 (0.756) |
+| QLIKE of the average / log-HAR | 0.978 | 0.969 | 0.992 |
+| DM, average vs log-HAR | not reported | -2.87 (0.004) | -0.52 (0.601) |
+| DM, average vs TTM | not reported | +1.12 (0.261) | -0.99 (0.324) |
+| Average in the pooled 10% MCS | not reported | yes | yes |
+| Assets with the average in the 10% MCS | 100% of 50 | 9 of 10 | 8 of 10 |
+| Assets with TTM in the 10% MCS | 90% of 50 | 10 of 10 | 9 of 10 |
+| Assets with log-HAR in the 10% MCS | 58% of 50 | 7 of 10 | 7 of 10 |
+| Assets where the average has the lowest QLIKE of all rows | not reported | 0 of 10 | 0 of 10 |
+
+### Per asset (QLIKE; the lowest per asset in bold)
+
+TTM window:
+
+| Model | BTC | ETH | SOL | BNB | XRP | DOGE | ADA | LTC | LINK | TRX |
+|---|---|---|---|---|---|---|---|---|---|---|
+| HAR | 0.302 | 0.275 | 0.261 | 0.566 | 0.558 | 1.024 | 1.207 | 0.809 | 0.746 | 0.451 |
+| log-HAR | 0.275 | 0.250 | 0.215 | 0.327 | 0.500 | 0.730 | 1.093 | 0.477 | 0.588 | 0.363 |
+| LightGBM | 0.272 | 0.255 | 0.211 | 0.318 | 0.480 | 0.729 | 1.000 | 0.442 | 0.566 | **0.352** |
+| Kronos-mini | 0.353 | 0.398 | 0.298 | 0.411 | 0.587 | 0.744 | 1.900 | **0.384** | 0.915 | 0.812 |
+| Kronos-small | 0.402 | 0.374 | 0.323 | 0.413 | 0.585 | 0.987 | 1.500 | 0.486 | 0.928 | 0.715 |
+| Student | 0.403 | 0.371 | 0.259 | 0.456 | 0.557 | 0.952 | 1.236 | 0.403 | 0.669 | 0.504 |
+| TTM-r2.1 (hourly) | 0.242 | 0.230 | **0.196** | **0.311** | **0.477** | 0.780 | 1.096 | 0.520 | **0.559** | 0.460 |
+| TTM-r2.1 (daily RV) | **0.224** | **0.217** | 0.198 | 0.339 | 0.508 | **0.695** | **0.966** | 0.518 | 0.568 | 0.391 |
+| Avg: TTM-r2.1 (hourly) + log-HAR | 0.253 | 0.235 | 0.200 | 0.314 | 0.483 | 0.747 | 1.090 | 0.493 | 0.569 | 0.394 |
+| Avg: TTM-r2.1 (daily RV) + log-HAR | 0.244 | 0.228 | 0.202 | 0.328 | 0.499 | 0.707 | 1.022 | 0.493 | 0.574 | 0.373 |
+
+TimesFM-2.5 window:
+
+| Model | BTC | ETH | SOL | BNB | XRP | DOGE | ADA | LTC | LINK | TRX |
+|---|---|---|---|---|---|---|---|---|---|---|
+| HAR | 0.297 | 0.287 | 0.270 | 0.626 | 0.608 | 1.152 | 1.359 | 0.906 | 0.830 | 0.476 |
+| log-HAR | 0.282 | 0.259 | 0.219 | 0.358 | 0.541 | 0.812 | 1.230 | 0.523 | 0.647 | 0.381 |
+| LightGBM | 0.281 | 0.262 | 0.216 | 0.343 | 0.520 | 0.811 | 1.125 | 0.480 | 0.625 | 0.365 |
+| Kronos-mini | 0.362 | 0.419 | 0.304 | 0.441 | 0.647 | 0.820 | 2.169 | **0.411** | 1.024 | 0.890 |
+| Kronos-small | 0.415 | 0.394 | 0.339 | 0.442 | 0.628 | 1.106 | 1.697 | 0.525 | 1.038 | 0.755 |
+| Student | 0.410 | 0.387 | 0.263 | 0.507 | 0.604 | 1.070 | 1.400 | 0.430 | 0.738 | 0.536 |
+| TTM-r2.1 (hourly) | 0.251 | 0.239 | 0.200 | 0.339 | 0.523 | 0.871 | 1.238 | 0.576 | 0.619 | 0.494 |
+| TTM-r2.1 (daily RV) | 0.237 | 0.228 | 0.205 | 0.371 | 0.557 | 0.772 | 1.086 | 0.575 | 0.630 | 0.408 |
+| TimesFM-2.5 (hourly) | 0.216 | 0.221 | 0.195 | 0.331 | **0.444** | **0.678** | **0.998** | 0.452 | **0.526** | 0.414 |
+| TimesFM-2.5 (daily RV) | **0.202** | **0.200** | **0.190** | **0.315** | 0.476 | 0.747 | 1.058 | 0.552 | 0.592 | **0.352** |
+| Avg: TTM-r2.1 (hourly) + log-HAR | 0.261 | 0.244 | 0.203 | 0.343 | 0.526 | 0.833 | 1.230 | 0.544 | 0.629 | 0.418 |
+| Avg: TTM-r2.1 (daily RV) + log-HAR | 0.254 | 0.238 | 0.207 | 0.359 | 0.544 | 0.787 | 1.151 | 0.544 | 0.635 | 0.391 |
+
+Chronos-2 window:
+
+| Model | BTC | ETH | SOL | BNB | XRP | DOGE | ADA | LTC | LINK | TRX |
+|---|---|---|---|---|---|---|---|---|---|---|
+| HAR | 0.259 | 0.271 | 0.252 | 0.438 | 0.360 | 0.597 | 0.420 | 0.508 | 0.394 | 0.503 |
+| log-HAR | 0.231 | 0.237 | 0.189 | 0.190 | 0.229 | 0.205 | 0.141 | 0.161 | 0.141 | 0.387 |
+| LightGBM | 0.228 | 0.243 | 0.187 | 0.190 | 0.208 | 0.203 | 0.145 | 0.166 | 0.151 | 0.377 |
+| Kronos-mini | 0.331 | 0.431 | 0.264 | 0.280 | 0.295 | 0.273 | 0.225 | 0.221 | 0.219 | 0.945 |
+| Kronos-small | 0.364 | 0.366 | 0.307 | 0.258 | 0.313 | 0.338 | 0.262 | 0.246 | 0.206 | 0.783 |
+| Student | 0.372 | 0.367 | 0.226 | 0.238 | 0.249 | 0.232 | 0.143 | 0.157 | 0.146 | 0.565 |
+| TTM-r2.1 (hourly) | 0.192 | 0.215 | 0.168 | 0.177 | 0.212 | 0.191 | 0.132 | 0.150 | **0.126** | 0.521 |
+| TTM-r2.1 (daily RV) | 0.173 | 0.208 | 0.176 | 0.184 | 0.233 | 0.212 | 0.148 | 0.163 | 0.138 | 0.422 |
+| TimesFM-2.5 (hourly) | 0.165 | 0.212 | 0.179 | 0.177 | 0.208 | 0.195 | 0.135 | 0.152 | 0.132 | 0.432 |
+| TimesFM-2.5 (daily RV) | **0.150** | **0.184** | **0.166** | **0.172** | **0.200** | **0.187** | **0.128** | **0.144** | 0.128 | **0.361** |
+| Chronos-2 (hourly) | 0.164 | 0.225 | 0.175 | 0.185 | 0.200 | 0.203 | 0.168 | 0.156 | 0.128 | 0.517 |
+| Chronos-2 (daily RV) | 0.158 | 0.199 | 0.178 | 0.173 | 0.218 | 0.196 | 0.136 | 0.160 | 0.135 | 0.365 |
+| Avg: TTM-r2.1 (hourly) + log-HAR | 0.206 | 0.221 | 0.172 | 0.178 | 0.214 | 0.192 | 0.132 | 0.152 | 0.129 | 0.431 |
+| Avg: TTM-r2.1 (daily RV) + log-HAR | 0.197 | 0.218 | 0.178 | 0.183 | 0.226 | 0.204 | 0.141 | 0.159 | 0.137 | 0.401 |
+
+### Raw against calibrated, and compute
+
+| Model | Series | Scale c | Window | QLIKE raw | QLIKE calibrated |
+|---|---|---|---|---|---|
+| TTM-r2.1 (hourly) | park | 1.400 | TTM-r2.1 | 0.6588 | 0.4871 |
+| TTM-r2.1 (daily RV) | sigma | 1.097 | TTM-r2.1 | 0.4825 | 0.4624 |
+| TimesFM-2.5 (hourly) | park | 1.642 | TimesFM-2.5 | 0.7392 | 0.4475 |
+| TimesFM-2.5 (daily RV) | sigma | 1.237 | TimesFM-2.5 | 0.5354 | 0.4686 |
+| Chronos-2 (hourly) | park | 1.703 | Chronos-2 | 0.3911 | 0.2122 |
+| Chronos-2 (daily RV) | sigma | 1.236 | Chronos-2 | 0.1881 | 0.1918 |
+
+| Model | Forecasts | CPU s / forecast | Wall s / forecast | Total CPU h (test) | Floored forecasts |
+|---|---|---|---|---|---|
+| TTM-r2.1 (hourly) | 4,570 | 0.002 | 0.002 | 0.00 | 0 |
+| TTM-r2.1 (daily RV) | 4,570 | 0.002 | 0.002 | 0.00 | 0 |
+| TimesFM-2.5 (hourly) | 3,950 | 0.373 | 0.266 | 0.41 | 0 |
+| TimesFM-2.5 (daily RV) | 3,950 | 0.781 | 0.612 | 0.86 | 0 |
+| Chronos-2 (hourly) | 3,360 | 0.200 | 0.164 | 0.19 | 0 |
+| Chronos-2 (daily RV) | 3,360 | 0.394 | 0.292 | 0.37 | 0 |
+
+Total CPU time of the new models on the test period: 1.8 CPU-hours, on 2 threads. The costs
+were measured during the run, while other jobs shared the machine, so they are higher than in the
+throughput check before the run (PLAN.md 13.6).
+
+* **Reproduction check.** In the same run, every existing model's test forecasts were recomputed from scratch
+  in the new environment: 55,300 of 55,300 forecast rows matched (0 missing, 0 extra); largest relative difference in a forecast 0; largest absolute difference in `performance_test.csv` 0; unchanged: yes.
+* **Environment.** granite-tsfm declares `torch<2.12`; the project keeps torch 2.15 through a uv override, so
+  the original environment is unchanged. The TTM forecasts were repeated under torch 2.11 in a separate
+  environment: 5,880 TTM output values on validation inputs, torch 2.11.0+cpu against the project's torch: largest relative difference 3e-07.
+
 ## Compute
 
 Kronos on the test period, measured during the run:
@@ -360,6 +687,7 @@ Frozen choices:
 Test log (`results/test_log.jsonl`):
 
 - run 1: 2026-11-22T09:41:33+00:00, config aba34451afb7, code a0cc4e422d02, forced=False
+- run 2: 2026-11-23T14:37:35+00:00, config aba34451afb7, code a5a54f703c90, forced=True, added: TSFM extension (PLAN.md section 13), TSFM config 7378c155e058
 
 ## What is new here
 
@@ -381,6 +709,11 @@ Test log (`results/test_log.jsonl`):
   the original, makes 16-path, 24-step forecasts cost about a second on 2 threads.
 * **A distilled student of a few thousand parameters.** It is trained only on pre-test teacher outputs and
   scored like every other model.
+* **Three newer foundation models, each scored only after its release.**
+  * Weights are pinned to HuggingFace commits and checked by SHA-256. A tested rule sets each model's scoring
+    start. TimesFM-2.5's re-exported weights were shown to equal the original upload.
+  * This is a direct test of the TTM + log-HAR claim of 2607.05291, on an asset class and period that no
+    model could have seen.
 
 ## Limits
 
@@ -400,6 +733,12 @@ Test log (`results/test_log.jsonl`):
 * **Kronos-base was run only on a small subset**, so its row has wide confidence bands.
 * **The student's feature extraction is pandas-bound** (milliseconds). Its network forward pass is tens of
   microseconds.
+* **The newer foundation models get one series each.** Here they see a single series derived from the
+  candles, not the candles themselves. TTM and Chronos-2 can take several channels and covariates; that was
+  not tried.
+* **The newer models have shorter windows.** TimesFM-2.5 is scored on 395 days and Chronos-2
+  on 336, so their tests have less power than TTM's. Chronos-2's window contains no crash
+  like 2025-10-10.
 
 ## Simplifications and deviations
 
@@ -444,6 +783,22 @@ Test log (`results/test_log.jsonl`):
 * **Data repairs.** Hourly gaps (31 hours in 6.8 years) are filled flat at the last close with zero volume.
   The 7 days with fewer than 260 of 288 five-minute bars are kept and flagged.
 
+**Newer foundation models (PLAN.md section 13)**
+* **Departures from 2607.05291.**
+  * The data are crypto, which trades 24/7, so days are calendar days. There are 10 assets and one horizon (1
+    day).
+  * A validation scale c is applied on top of the raw forecast; the raw rows are reported too.
+  * Forecasts are not winsorised to their past range.
+  * The model confidence set covers the 6 reference models plus the new rows, not the paper's 17 models.
+  * Chronos-2 is not in that paper. It gets the 1,000-day context the paper gives its other models.
+* **TTM checkpoint.** We use the `512-96-ft-r2.1` branch (frequency-tuned, r2.1 release), not the repo's main
+  branch (512-96-r2), because it is the checkpoint of 2607.05291 and it takes hourly and daily data. Its context
+  is fixed at 512 steps, so with hourly input it sees 24 more candles than Kronos.
+* **TimesFM-2.5's mean head** is the point forecast, not the median the library returns as its "point"
+  output.
+* **Only the validation-chosen hourly series was generated on test.** Test forecasts of each model start at
+  its scoring start; nothing earlier was generated.
+
 **Order of runs.** The Kronos test-period forecasts were generated (with the frozen Kronos settings) before
 the student was fitted and the full config frozen. The student reads no test-period file, and all scoring
 happened once, after `freeze`. See PLAN.md, "Changes during the build".
@@ -470,11 +825,46 @@ uv run python -m kvh.cli kronos --period test --models mini      # frozen settin
 uv run python -m kvh.cli kronos --period test --models small
 uv run python -m kvh.cli kronos --period test --models base --symbols BTCUSDT,ETHUSDT --stride 4
 uv run python -m kvh.cli test              # scores once; a rerun needs --force and is logged
+# newer foundation models (PLAN.md section 13), each scored only after its release
+uv run python -m kvh.cli tsfm --period val           # TTM, TimesFM-2.5, Chronos-2: every validation day, both inputs
+uv run python -m kvh.cli tsfm-validate               # scale c and hourly series -> results/frozen_tsfm.json + sha256
+uv run python -m kvh.cli tsfm --period test          # frozen settings, from each model's scoring start
+uv run python -m kvh.cli tsfm-test                   # scores once (an added, forced run in the test log) + reproduction check
 uv run python -m kvh.cli report            # tables.md, figures, this README
-uv run pytest                              # 6 groups of tests
+uv run pytest                              # 9 groups of tests (the TSFM weight tests skip without local weights)
 ```
 
 The Kronos jobs write one parquet file per (model, setting, asset, month) under
-`~/.cache/quant-research/p3/kronos/`, so an interrupted run resumes where it stopped. The model code
-is vendored in `third_party/kronos/` (MIT licence, commit 67b630e). The weights are pinned to their
-HuggingFace revisions in `src/kvh/config.py`.
+`~/.cache/quant-research/p3/kronos/`, so an interrupted run resumes where it stopped; the TSFM jobs do the
+same under `~/.cache/quant-research/p3/tsfm/`. The model code is vendored in `third_party/kronos/` (MIT
+licence, commit 67b630e). All weights are pinned to HuggingFace commits in `src/kvh/config.py` and downloaded
+to `~/.cache/quant-research/p3/hf/`, outside the repo. `scripts/ttm_torch_check.py` repeats the TTM forecasts
+under torch 2.11 (the range granite-tsfm declares) in a separate environment.
+
+## Related work (2026)
+
+* **Brini, "Forecasting Realized Volatility with Time Series Foundation Models: A Comparison with Econometric
+  Benchmarks", [arXiv 2607.05291](https://arxiv.org/abs/2607.05291)** (July 2026, revised November 2026).
+  * Setup: nine zero-shot foundation models against eight econometric models, on realised volatility of 50
+    VOLARE assets (equities, currencies, futures), 1, 5 and 22 days ahead.
+  * Findings: the foundation models do not beat the econometric models as a class. Only TTM, the smallest,
+    beats log-HAR in average QLIKE, narrowly, at every horizon. The equal-weight TTM + log-HAR average matches
+    the best single model and is in the model confidence set for nearly every asset.
+  * The section "Newer foundation models" above tests that claim on crypto, after TTM's weights date.
+* **Upadhyay, "Do Time-Series Foundation Models Forecast Index-Futures Returns? A Preregistered Evaluation of
+  Models, Metrics, and Input Representations", [arXiv 2611.12141](https://arxiv.org/abs/2611.12141)**
+  (November 2026). On E-mini Nasdaq-100 and S&P 500 futures, 5 to 120 minutes ahead, 0 of 160
+  model-representation-horizon-market cells beat a no-change forecast on a blind set opened once. Kronos is
+  evaluated in separate experiments.
+* **Bulut, "Conflicting History in Foundation Model Return Forecasts",
+  [arXiv 2610.25822](https://arxiv.org/abs/2610.25822)** (October 2026). Older observations can teach a
+  foundation model a predictive relationship but mislead it once the relationship changes. In simulations
+  this "conflicting history" lowers the chance of beating a zero forecast; on 56 assets, neither 256 nor 64
+  returns of context beat zero.
+* **Noguer i Alonso and Pereira Franklin, "Pretrained Time-Series Foundation Models for Financial Return
+  Forecasting", [arXiv 2606.27100](https://arxiv.org/abs/2606.27100)** (June 2026). TimeGPT,
+  TimesFM-2.5, Moirai-2.0, Chronos and Chronos-2 against neural models trained from scratch, on five US
+  stocks. Pretrained models win most rankings, but their gains over a random walk are small and sparse.
+* **Shi et al., "Kronos: A Foundation Model for the Language of Financial Markets",
+  [arXiv 2508.02739](https://arxiv.org/abs/2508.02739)** (August 2025, AAAI 2026). The model of the
+  original study.

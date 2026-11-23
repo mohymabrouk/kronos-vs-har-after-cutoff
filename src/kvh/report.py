@@ -197,6 +197,245 @@ def fig_cost(perf: pd.DataFrame, cost: dict, dist: dict):
     plt.close(fig)
 
 
+# ---- TSFM extension (PLAN.md section 13) ----------------------------------------------------------------------------
+TSFM_REFS = ["HAR", "log-HAR", "LightGBM", "Kronos-mini", "Kronos-small", "Student"]
+WIN_TITLE = {"ttm": "TTM-r2.1", "timesfm": "TimesFM-2.5", "chronos2": "Chronos-2"}
+
+
+def slug(s: str) -> str:
+    out = "".join(ch if ch.isalnum() else "_" for ch in s.upper())
+    while "__" in out:
+        out = out.replace("__", "_")
+    return out.strip("_")
+
+
+def fmt_dm(st, p) -> str:
+    return "" if st is None or (isinstance(st, float) and np.isnan(st)) else f"{st:+.2f} ({fmt_p(p)})"
+
+
+def _sel(df: pd.DataFrame, **kw) -> pd.DataFrame:
+    for k, x in kw.items():
+        df = df[df[k] == x]
+    return df
+
+
+def _dm_cell(d: pd.DataFrame, model: str, versus: str) -> str:
+    x = _sel(d, model=model, versus=versus)
+    return fmt_dm(x["dm"].iloc[0], x["p"].iloc[0]) if len(x) else ""
+
+
+def tsfm_tables(T: dict) -> list:
+    """Fill the TSFM placeholders from results/ (once the extension has been scored); returns tables.md lines."""
+    from kvh import tsfm
+
+    need = ["tsfm_performance.csv", "tsfm_dm.csv", "tsfm_per_asset.csv", "tsfm_mcs.csv", "frozen_tsfm.json", "validation_tsfm.csv",
+            "tsfm_cost.json", "tsfm_reproduction.json", "related_2607_05291.json"]
+    if not all((R / f).exists() for f in need):
+        return []
+    perf = pd.read_csv(R / "tsfm_performance.csv")
+    dm = pd.read_csv(R / "tsfm_dm.csv")
+    pa = pd.read_csv(R / "tsfm_per_asset.csv")
+    mcs = pd.read_csv(R / "tsfm_mcs.csv")
+    fz = json.loads((R / "frozen_tsfm.json").read_text())
+    val = pd.read_csv(R / "validation_tsfm.csv")
+    cost = json.loads((R / "tsfm_cost.json").read_text())
+    repro = json.loads((R / "tsfm_reproduction.json").read_text())
+    wins = list(config.TSFM_MODELS)
+    ndays = perf.groupby("window")["n_days"].first()
+    nsym = len(config.SYMBOLS)
+
+    # pins and windows
+    rows = []
+    for n in wins:
+        m = fz["models"][n]
+        rows.append({"Model": m["label"], "Parameters": f"{cost['params'][n]:,}",
+                     "Weights (HF repo, branch @ pinned commit)": f"`{m['repo']}`, `{m['branch']}` @ `{m['revision'][:8]}`",
+                     "Weights date": m["weights_date"], "Training data on the model card": m["data_note"],
+                     "Scored from": m["scoring_start"], "Test days": int(ndays[n])})
+    T["TSFM_PINS"] = md_table(pd.DataFrame(rows))
+    for n in wins:
+        T[f"TSFM_PARAMS_{slug(n)}"] = f"{cost['params'][n] / 1e6:.2f}M"
+
+    # validation choices
+    v = val[val["spec"].isin(config.TSFM_SPECS)].copy()
+    chosen = {(n, s): fz["models"][n][s]["variant"] for n in wins for s in config.TSFM_SPECS}
+    T["TSFM_VAL"] = md_table(pd.DataFrame({
+        "Model": v["model"].map(lambda n: fz["models"][n]["label"]), "Input": v["spec"].map({"H": "hourly (H)", "D": "daily RV (D)"}),
+        "Series": v["variant"], "Forecasts": v["forecasts"].astype(int), "Scale c": v["scale"].map(lambda x: f"{x:.3f}"),
+        "QLIKE raw": v["val_qlike_raw"].map(lambda x: f"{x:.4f}"), "QLIKE calibrated": v["val_qlike_cal"].map(lambda x: f"{x:.4f}"),
+        "Chosen": [("yes" if chosen[(n, s)] == var else "") for n, s, var in zip(v["model"], v["spec"], v["variant"])]}))
+    yard = val[val["model"].isin(["HAR", "log-HAR"])].set_index("model")["val_qlike_cal"]
+    T["TSFM_VAL_HAR"] = f"{yard['HAR']:.4f}"
+    T["TSFM_VAL_LOGHAR"] = f"{yard['log-HAR']:.4f}"
+
+    out_lines = []
+    for w in wins:
+        p = perf[(perf["window"] == w) & (perf["kind"] != "raw")]
+        d = dm[(dm["window"] == w) & (dm["loss"] == "QLIKE") & (dm["sample"] == "all")]
+        dmse = dm[(dm["window"] == w) & (dm["loss"] == "MSE") & (dm["sample"] == "all")]
+        rows = []
+        for _, r in p.iterrows():
+            row = {"Model": r["model"], "QLIKE": f"{r['qlike']:.4f}", "QLIKE / log-HAR": f"{r['qlike_rel_log_har']:.3f}",
+                   "MSE": f"{r['mse']:.1f}", "MZ R^2": f"{r['mz_r2']:.3f}"}
+            for ref in TSFM_REFS:
+                row[f"DM vs {ref}"] = _dm_cell(d, r["model"], ref)
+            own = d[(d["model"] == r["model"]) & ~d["versus"].isin(TSFM_REFS)]
+            row["DM vs its TTM row"] = fmt_dm(own["dm"].iloc[0], own["p"].iloc[0]) if len(own) else ""
+            row["DM vs log-HAR (MSE)"] = _dm_cell(dmse, r["model"], "log-HAR")
+            rows.append(row)
+        T[f"TSFM_WIN_{slug(w)}"] = md_table(pd.DataFrame(rows))
+        T[f"TSFM_N_{slug(w)}"] = f"{int(p['n'].iloc[0]):,}"
+        T[f"TSFM_DAYS_{slug(w)}"] = str(int(p["n_days"].iloc[0]))
+        T[f"TSFM_START_{slug(w)}"] = str(p["window_start"].iloc[0])
+        # scalars for the prose: QLIKE, ratio to log-HAR, DM (p) against each reference, also without the crash day
+        for _, r in perf[perf["window"] == w].iterrows():
+            k = f"{slug(w)}_{slug(r['model'])}"
+            T[f"TQ_{k}"] = f"{r['qlike']:.3f}"
+            T[f"TR_{k}"] = f"{r['qlike_rel_log_har']:.3f}"
+            if not np.isnan(r["qlike_excl_crash"]):
+                T[f"TQX_{k}"] = f"{r['qlike_excl_crash']:.3f}"
+        for _, r in dm[(dm["window"] == w) & (dm["loss"] == "QLIKE")].iterrows():
+            k = f"{slug(w)}_{slug(r['model'])}_VS_{slug(r['versus'])}"
+            pre = "TDM" if r["sample"] == "all" else "TDMX"
+            T[f"{pre}_{k}"] = f"{r['dm']:+.2f}"
+            T[f"{pre}P_{k}"] = fmt_p(r["p"])
+        # per asset: models x assets, the lowest QLIKE per asset in bold
+        q = pa[(pa["window"] == w) & ~pa["model"].str.contains("(raw)", regex=False)].pivot_table(index="model", columns="symbol", values="qlike")
+        q = q.reindex([m for m in p["model"] if m in q.index])[config.SYMBOLS]
+        best = q.idxmin(axis=0)
+        tab = pd.DataFrame({s.replace("USDT", ""): [f"**{q.loc[m, s]:.3f}**" if best[s] == m else f"{q.loc[m, s]:.3f}" for m in q.index]
+                            for s in q.columns})
+        tab.insert(0, "Model", list(q.index))
+        T[f"TSFM_PA_{slug(w)}"] = md_table(tab)
+        out_lines += [f"## TSFM extension, {WIN_TITLE[w]} window (from {p['window_start'].iloc[0]})", T[f"TSFM_WIN_{slug(w)}"], "",
+                      "Per asset (QLIKE)", "", T[f"TSFM_PA_{slug(w)}"], ""]
+
+    # how many DM tests of the new calibrated rows against Kronos and the student are significant (all windows)
+    new_rows = set(perf[perf["kind"] == "new"]["model"])
+    k = dm[(dm["loss"] == "QLIKE") & (dm["sample"] == "all") & dm["model"].isin(new_rows)
+           & dm["versus"].isin(["Kronos-mini", "Kronos-small", "Student"])]
+    T["TSFM_KRONOS_SIG"] = f"{int(((k['p'] < 0.05) & (k['dm'] < 0)).sum())} of {len(k)}"
+    T["TSFM_KRONOS_WORSE"] = str(int((k["dm"] > 0).sum()))
+    h = dm[(dm["loss"] == "QLIKE") & (dm["sample"] == "all") & dm["model"].isin(new_rows) & (dm["versus"] == "HAR")]
+    T["TSFM_HAR_SIG"] = f"{int(((h['p'] < 0.05) & (h['dm'] < 0)).sum())} of {len(h)}"
+    ms = dm[(dm["loss"] == "MSE") & (dm["sample"] == "all") & dm["model"].isin(new_rows) & (dm["versus"] == "log-HAR")]
+    T["TSFM_MSE_SIG"] = f"{int((ms['p'] < 0.05).sum())} of {len(ms)}"
+
+    # without the crash day (windows that contain it)
+    rows = []
+    for w in wins:
+        p = perf[(perf["window"] == w) & (perf["kind"] != "raw")]
+        if p["qlike_excl_crash"].isna().all():
+            continue
+        dx = dm[(dm["window"] == w) & (dm["loss"] == "QLIKE") & (dm["sample"] == "excl_crash")]
+        for _, r in p.iterrows():
+            row = {"Window": WIN_TITLE[w], "Model": r["model"], "QLIKE, all days": f"{r['qlike']:.4f}",
+                   "QLIKE, without 2025-10-10": f"{r['qlike_excl_crash']:.4f}"}
+            for ref in TSFM_REFS:
+                row[f"DM vs {ref}"] = _dm_cell(dx, r["model"], ref)
+            rows.append(row)
+    T["TSFM_CRASH"] = md_table(pd.DataFrame(rows))
+
+    # MCS: pooled p-value and number of assets in the per-asset 10% MCS
+    rows = []
+    for m in dict.fromkeys(perf[perf["kind"] != "raw"]["model"]):
+        row = {"Model": m}
+        for w in wins:
+            x = mcs[(mcs["window"] == w) & (mcs["model"] == m)]
+            a, b = f"{WIN_TITLE[w]} window: pooled MCS p", f"{WIN_TITLE[w]} window: assets in MCS"
+            if not len(x):
+                row[a] = row[b] = ""
+                continue
+            pooled = x[x["scope"] == "pooled"]
+            row[a] = f"{pooled['mcs_p'].iloc[0]:.3f}" + (" (in)" if bool(pooled["in_mcs_10pct"].iloc[0]) else " (out)")
+            row[b] = f"{int(x[x['scope'] != 'pooled']['in_mcs_10pct'].sum())} / {nsym}"
+        rows.append(row)
+    T["TSFM_MCS"] = md_table(pd.DataFrame(rows))
+
+    # the 2607.05291 claim, on TTM's own window (the whole test period)
+    rel = json.loads((R / "related_2607_05291.json").read_text())
+    w = "ttm"
+    pw = perf[perf["window"] == w].set_index("model")
+    d = dm[(dm["window"] == w) & (dm["loss"] == "QLIKE") & (dm["sample"] == "all")]
+    mw = mcs[mcs["window"] == w]
+    paw = pa[(pa["window"] == w) & ~pa["model"].str.contains("(raw)", regex=False)]
+    best_by_asset = paw.loc[paw.groupby("symbol")["qlike"].idxmin(), "model"].value_counts()
+
+    def assets_in(m):
+        return int(mw[(mw["model"] == m) & (mw["scope"] != "pooled")]["in_mcs_10pct"].sum())
+
+    def in_pooled(m):
+        return "yes" if bool(mw[(mw["model"] == m) & (mw["scope"] == "pooled")]["in_mcs_10pct"].iloc[0]) else "no"
+
+    cols = {s: (tsfm.label("ttm", s), tsfm.avg_label(s)) for s in ("D", "H")}
+    pr, pm, na = rel["qlike_ratio_to_log_har"], rel["mcs_inclusion_pct_of_assets"], rel["n_assets"]
+    spec_rows = [
+        ("QLIKE of TTM / log-HAR", f"{pr['TTM']:.3f}", lambda t, a: f"{pw.loc[t, 'qlike_rel_log_har']:.3f}"),
+        ("DM, TTM vs log-HAR (QLIKE)", "not reported", lambda t, a: _dm_cell(d, t, "log-HAR")),
+        ("QLIKE of the average / log-HAR", f"{pr['TTM + log-HAR (equal weight)']:.3f}", lambda t, a: f"{pw.loc[a, 'qlike_rel_log_har']:.3f}"),
+        ("DM, average vs log-HAR", "not reported", lambda t, a: _dm_cell(d, a, "log-HAR")),
+        ("DM, average vs TTM", "not reported", lambda t, a: _dm_cell(d, a, t)),
+        ("Average in the pooled 10% MCS", "not reported", lambda t, a: in_pooled(a)),
+        ("Assets with the average in the 10% MCS", f"{pm['TTM + log-HAR (equal weight)']:.0f}% of {na}", lambda t, a: f"{assets_in(a)} of {nsym}"),
+        ("Assets with TTM in the 10% MCS", f"{pm['TTM']:.0f}% of {na}", lambda t, a: f"{assets_in(t)} of {nsym}"),
+        ("Assets with log-HAR in the 10% MCS", f"{pm['log-HAR']:.0f}% of {na}", lambda t, a: f"{assets_in('log-HAR')} of {nsym}"),
+        ("Assets where the average has the lowest QLIKE of all rows", "not reported",
+         lambda t, a: f"{int(best_by_asset.get(a, 0))} of {nsym}"),
+    ]
+    T["TSFM_CLAIM"] = md_table(pd.DataFrame([{"": name, "2607.05291 (50 VOLARE assets, h = 1)": paper,
+                                              "Here, daily RV input (D, as the paper)": fn(*cols["D"]),
+                                              "Here, hourly input (H)": fn(*cols["H"])} for name, paper, fn in spec_rows]))
+    for s in ("D", "H"):
+        T[f"TSFM_AVG_ASSETS_MCS_{s}"] = str(assets_in(cols[s][1]))
+        T[f"TSFM_AVG_BEST_{s}"] = str(int(best_by_asset.get(cols[s][1], 0)))
+        T[f"TSFM_TTM_ASSETS_MCS_{s}"] = str(assets_in(cols[s][0]))
+        T[f"TSFM_AVG_POOLED_MCS_{s}"] = in_pooled(cols[s][1])
+    T["TSFM_LOGHAR_ASSETS_MCS"] = str(assets_in("log-HAR"))
+    T["TSFM_PAPER_TTM_RATIO"] = f"{pr['TTM']:.3f}"
+    T["TSFM_PAPER_AVG_RATIO"] = f"{pr['TTM + log-HAR (equal weight)']:.3f}"
+    T["TSFM_PAPER_AVG_MCS"] = f"{pm['TTM + log-HAR (equal weight)']:.0f}"
+
+    # raw against calibrated, each model on its own window
+    rows = []
+    for n in wins:
+        pp = perf[perf["window"] == n].set_index("model")
+        for s in config.TSFM_SPECS:
+            lab = tsfm.label(n, s)
+            rows.append({"Model": lab, "Series": fz["models"][n][s]["variant"], "Scale c": f"{fz['models'][n][s]['scale']:.3f}",
+                         "Window": WIN_TITLE[n], "QLIKE raw": f"{pp.loc[lab + ' (raw)', 'qlike']:.4f}",
+                         "QLIKE calibrated": f"{pp.loc[lab, 'qlike']:.4f}"})
+    T["TSFM_RAW"] = md_table(pd.DataFrame(rows))
+
+    # compute
+    T["TSFM_COST"] = md_table(pd.DataFrame([{
+        "Model": lab, "Forecasts": f"{c['forecasts']:,}", "CPU s / forecast": f"{c['cpu_s']:.3f}", "Wall s / forecast": f"{c['wall_s']:.3f}",
+        "Total CPU h (test)": f"{c['cpu_s'] * c['forecasts'] / 3600:.2f}", "Floored forecasts": c["floored"]}
+        for lab, c in cost["test"].items()]))
+    T["TSFM_CPU_H"] = f"{sum(c['cpu_s'] * c['forecasts'] for c in cost['test'].values()) / 3600:.1f}"
+
+    # reproduction and the torch check
+    T["TSFM_REPRO"] = (f"{repro['rows_matched']:,} of {repro['rows_old']:,} forecast rows matched "
+                       f"({repro['only_old']} missing, {repro['only_new']} extra); largest relative difference in a forecast "
+                       f"{repro['max_rel_diff_forecast']:.1g}; largest absolute difference in `performance_test.csv` "
+                       f"{repro['max_abs_diff_performance_test']:.1g}; unchanged: {'yes' if repro['unchanged'] else 'NO'}")
+    wc_path = R / "tsfm_timesfm_weights_check.json"
+    if wc_path.exists():
+        wc = json.loads(wc_path.read_text())
+        T["TSFM_TIMESFM_WEIGHTS"] = (f"{wc['tensors_bit_identical']} of {wc['tensors_refreshed']} tensors"
+                                     + (" bit-identical" if wc["max_abs_diff"] == 0 else f", largest difference {wc['max_abs_diff']:.1g}"))
+    tc_path = R / "tsfm_ttm_torch_check.json"
+    if tc_path.exists():
+        tc = json.loads(tc_path.read_text())
+        parts = [x for x in tc.values() if isinstance(x, dict)]
+        T["TSFM_TORCH"] = (f"{sum(x['n'] for x in parts):,} TTM output values on validation inputs, torch {tc['torch']} against "
+                           f"the project's torch: largest relative difference {max(x['max_rel_diff'] for x in parts):.1g}")
+    out_lines += ["## TSFM extension: pins and windows", T["TSFM_PINS"], "", "## TSFM extension: validation", T["TSFM_VAL"], "",
+                  "## TSFM extension: without 2025-10-10", T["TSFM_CRASH"], "", "## TSFM extension: MCS", T["TSFM_MCS"], "",
+                  "## TSFM extension: the 2607.05291 claim (TTM window)", T["TSFM_CLAIM"], "",
+                  "## TSFM extension: raw vs calibrated", T["TSFM_RAW"], "", "## TSFM extension: compute", T["TSFM_COST"], ""]
+    return out_lines
+
+
 def run() -> None:
     perf = pd.read_csv(R / "performance_test.csv")
     pa = pd.read_csv(R / "performance_per_asset.csv")
@@ -293,7 +532,8 @@ def run() -> None:
                                        for k, v in kc.items()]))
     T["FROZEN"] = "```json\n" + json.dumps({"har_windows": fz["har"], "kronos": fz["kronos"], "student": fz["student"]}, indent=1) + "\n```"
     last = tlog[-1]
-    T["TESTLOG"] = "\n".join(f"- run {e['run']}: {e['timestamp_utc']}, config {e['config_sha256'][:12]}, code {e['code_sha256'][:12]}, forced={e['forced']}" for e in tlog)
+    T["TESTLOG"] = "\n".join(f"- run {e['run']}: {e['timestamp_utc']}, config {e['config_sha256'][:12]}, code {e['code_sha256'][:12]}, forced={e['forced']}"
+                             + (f", added: {e['added']}, TSFM config {e['tsfm_config_sha256'][:12]}" if e.get("added") else "") for e in tlog)
     n_rows = int(perf["n"].iloc[0])
     T["N_TEST"] = f"{n_rows:,}"
     T["N_DAYS"] = str(fc["date"].nunique())
@@ -329,7 +569,21 @@ def run() -> None:
               "## Validation: Kronos settings", T["VAL_KRONOS"], "", "## Validation: variance extraction x N", T["VAL_VARIANT"], "",
               "## Validation: HAR windows", T["VAL_HAR"], "", "## Validation: student", T["VAL_STUDENT"], "",
               "## Throughput (2 threads)", T["THROUGHPUT"], "", "## Frozen choices", T["FROZEN"], "", "## Test log", T["TESTLOG"], ""]
+    tables += tsfm_tables(T)
     (R / "tables.md").write_text("\n".join(tables), encoding="utf-8")
+
+    # Holm adjustment over the six pre-declared tests: each new model x input vs log-HAR (QLIKE), on its own window.
+    dm_t = pd.read_csv(R / "tsfm_dm.csv")
+    own = {"ttm": "TTM-r2.1", "timesfm": "TimesFM-2.5", "chronos2": "Chronos-2"}
+    prim = dm_t[(dm_t["versus"] == "log-HAR") & (dm_t["loss"] == "QLIKE") & (dm_t["sample"] == "all")
+                & np.array([m in (f"{own.get(w, '?')} (hourly)", f"{own.get(w, '?')} (daily RV)")
+                            for w, m in zip(dm_t["window"], dm_t["model"])])]
+    p_sorted = np.sort(prim["p"].to_numpy())
+    holm = np.maximum.accumulate(np.minimum(1.0, p_sorted * (len(p_sorted) - np.arange(len(p_sorted)))))
+    T["HOLM_N"] = str(len(p_sorted))
+    n_sig = int((holm < 0.05).sum())
+    T["HOLM_N_SIG"] = "none" if n_sig == 0 else str(n_sig)
+    T["HOLM_MIN_P"] = f"{holm[0]:.2f}"
 
     tpl_path = config.ROOT / "scripts" / "README.template.md"
     if tpl_path.exists():

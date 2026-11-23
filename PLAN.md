@@ -351,3 +351,47 @@ TTM outputs are checked against a separate torch 2.11 environment on the same in
 cache under the home directory (`~/.cache/quant-research/p3/hf`), never in the repo. 2 threads, one heavy
 process at a time.
 
+### 13.6 Changes during the extension
+
+(appended as they happen)
+* **2026-11-23 11:58 UTC - throughput** (smoke test on 32 validation days of BTC, 2 threads, wall seconds per
+  forecast, batch 32): TTM 0.002 (H) / 0.001 (D); TimesFM-2.5 0.19 / 0.34; Chronos-2 0.09 / 0.18. So validation
+  on every day (3,650 asset-days per series) and the full test windows fit in about 2 hours; no stride.
+* **11:58 - parameter counts** (counted from the loaded models): TTM 855,100; TimesFM-2.5 231,289,280;
+  Chronos-2 119,477,664.
+* **12:06 - torch check done** (`scripts/ttm_torch_check.py`, `results/tsfm_ttm_torch_check.json`): TTM under
+  torch 2.11 (granite-tsfm's declared range, separate environment) against the project's torch 2.15 on 120
+  validation inputs per series: largest relative difference 2.5e-7 over 5,880 values (float32 rounding).
+* **12:12 - the weight file of each pinned revision is checked by SHA-256** (the LFS object id, in
+  `config.TSFM_MODELS`) in a pytest that skips when the weights are not cached (CI).
+* **12:00 - no local absolute paths in scripts.** The four existing chain scripts did `cd` to an absolute local
+  path; they now `cd` relative to the script. No behaviour change.
+* **12:01-13:09 - validation forecasts** (`scripts/run_tsfm_val.sh`): every validation day, 10 assets, H (cc and
+  park) and D, for the three models; TTM 0.5 min, TimesFM-2.5 38 min, Chronos-2 30 min. No forecast hit the floor.
+* **13:08 - dry run of the scoring and report code on validation forecasts only** (fake windows inside the
+  validation year, output outside the repo), to debug the code before the single test run. No test-period
+  forecast existed at that point.
+* **13:10 - `tsfm-validate`, frozen** (`results/frozen_tsfm.json`, SHA-256 7378c155e058...): the Parkinson
+  series (`park`) wins on validation for all three hourly inputs. Scales c: TTM 1.400 (H) / 1.097 (D);
+  TimesFM-2.5 1.642 / 1.237; Chronos-2 1.703 / 1.236. Calibrated validation QLIKE: TTM 0.245 / 0.244,
+  TimesFM-2.5 0.229 / 0.231, Chronos-2 0.240 / 0.242, against HAR 0.306 and log-HAR 0.260 on the same
+  asset-days (the validation year is before the weights dates, so possibly inside the training data).
+* **13:10 - test-period chain started** (`scripts/run_tsfm_test.sh`): forecasts from each scoring start with
+  the frozen settings, then `tsfm-test` once, then `report`.
+* **13:10-14:36 - test forecasts** (logged in `results/tsfm_test_generation.jsonl`): TTM 1 min, TimesFM-2.5
+  58 min, Chronos-2 26 min. Two other projects ran on the machine at the same time, so these runs were slower
+  than the throughput check (TimesFM-2.5 daily input about 0.6 s wall per forecast instead of 0.34).
+* **14:37 - the single scoring run** (`tsfm-test`; `results/test_log.jsonl` run 2, forced = true, added = "TSFM
+  extension (PLAN.md section 13)", original config aba34451afb7..., TSFM config 7378c155e058..., code
+  a5a54f703c90...). Reproduction check: all 55,300 original
+  forecast rows recomputed from scratch, largest relative difference 0, `performance_test.csv` reproduced
+  exactly. Read-outs (all from the run's files): with the daily RV input, TTM beats log-HAR on the whole test
+  and TimesFM-2.5 on its window (and LightGBM too); with the hourly input no model beats log-HAR
+  significantly; every new model scores below Kronos and the student; the TTM + log-HAR average beats log-HAR
+  but not TTM. No rerun.
+* **After the scoring run - report and README only** (so the code hash in the test log predates these):
+  three counts computed from `results/tsfm_dm.csv` for the README prose (significant DM tests against
+  Kronos/student, HAR and on MSE), parameter counts and scoring starts as placeholders instead of typed
+  numbers, and `scripts/timesfm_weights_check.py` (the TimesFM-2.5 weight-equivalence check of 13.1, moved
+  from a scratch script into the repo; its output is `results/tsfm_timesfm_weights_check.json`). No forecast,
+  choice or score changed.
