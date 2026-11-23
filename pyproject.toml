@@ -17,7 +17,16 @@ dependencies = [
     "huggingface_hub>=0.30",
     "einops>=0.8",
     "pytest>=8.0",
+    # newer time-series foundation models (PLAN.md section 13)
+    "chronos-forecasting>=2.3.2",
+    "timesfm[torch]>=3.0.2",
+    "granite-tsfm>=0.3.12",
 ]
+
+[tool.uv]
+# granite-tsfm pins torch<2.12; the study is locked at torch 2.15 (CPU). Lifting that upper bound keeps the
+# environment of the original results unchanged (TTM outputs checked against torch 2.11, PLAN.md 13.6).
+override-dependencies = ["torch>=2.10"]
 
 [tool.uv.sources]
 torch = { index = "pytorch-cpu" }
