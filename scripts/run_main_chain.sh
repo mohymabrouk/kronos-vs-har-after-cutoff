@@ -6,7 +6,7 @@
 #   before `test` scores anything.
 set -e
 export PYTHONIOENCODING=utf-8 OMP_NUM_THREADS=2 MKL_NUM_THREADS=2 OPENBLAS_NUM_THREADS=2
-cd /c/dev/quant-research/project_3_kronos_vs_har
+cd "$(dirname "$0")/.."
 SMALL_TAG=$(uv run python -c "import json; print(json.load(open('results/frozen_kronos.json'))['small']['tag'])")
 echo "start $(date); small tag $SMALL_TAG" >> logs/chain.out
 uv run python -m kvh.cli kronos --period test --models mini > logs/test_mini.out 2>&1
